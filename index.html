@@ -1,20 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Learning D3 </title>
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scroll Story</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
+
 <body>
-    <h1>Hello, World!</h1>
 
-    <p>
-        This is my first message.
-    </p>
+<div class="viz-container">
+  <div class="viz">Visualization goes here</div>
+</div>
 
-    <button>Click me!</button>
-    <button>Do NOT click me</button>
+<div class="scroll-container">
 
-    <script src="script.js"></script>
+  <section class="step" data-step="1">
+    <h2>Step 1</h2>
+    <p>Introduction to the idea.</p>
+  </section>
+
+  <section class="step" data-step="2">
+    <h2>Step 2</h2>
+    <p>Something changes in the story.</p>
+  </section>
+
+  <section class="step" data-step="3">
+    <h2>Step 3</h2>
+    <p>We update the visualization.</p>
+  </section>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
