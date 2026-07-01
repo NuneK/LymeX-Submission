@@ -1,0 +1,1 @@
+constole.log("Hello, this is from JavaScript!")
