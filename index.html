@@ -1,38 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Scroll Story</title>
-  <link rel="stylesheet" href="style.css"/>
-</head>
+<div class="container">
 
-<body>
+  <!-- Scrolling text -->
+  <div class="scroller">
 
-<div class="viz-container">
-  <div class="viz">Visualization goes here</div>
-</div>
+    <section class="step active" data-step="1">
+      <h2>Introduction</h2>
+      <p>Explain the first idea.</p>
+    </section>
 
-<div class="scroll-container">
+    <section class="step" data-step="2">
+      <h2>Step Two</h2>
+      <p>Describe what changes.</p>
+    </section>
 
-  <section class="step" data-step="1">
-    <h2>Step 1</h2>
-    <p>Introduction to the idea.</p>
-  </section>
+    <section class="step" data-step="3">
+      <h2>Conclusion</h2>
+      <p>Wrap everything up.</p>
+    </section>
 
-  <section class="step" data-step="2">
-    <h2>Step 2</h2>
-    <p>Something changes in the story.</p>
-  </section>
+  </div>
 
-  <section class="step" data-step="3">
-    <h2>Step 3</h2>
-    <p>We update the visualization.</p>
-  </section>
+  <!-- Sticky visualization -->
+  <div class="graphic">
+    <svg id="viz"></svg>
+  </div>
 
 </div>
-
-<script src="script.js"></script>
-
-</body>
-</html>
