@@ -71,39 +71,21 @@ let hoveringGraphic = false;
 
 function showCircle() {
 
-    // Cancel any queued animations
     circle.interrupt();
     timelineGroup.interrupt();
 
-    timelineGroup
-        .transition()
-        .duration(300)
-        .style("opacity", 0);
-
-    circle
-        .style("opacity", 1)      // immediately restore visibility
-        .transition()
-        .duration(300)
-        .style("opacity", 1);
+    circle.style("opacity", 1);
+    timelineGroup.style("opacity", 0);
 
 }
 
 function showTimeline() {
 
-    // Cancel any queued animations
     circle.interrupt();
     timelineGroup.interrupt();
 
-    circle
-        .transition()
-        .duration(300)
-        .style("opacity", 0);
-
-    timelineGroup
-        .style("opacity", 1)
-        .transition()
-        .duration(300)
-        .style("opacity", 1);
+    circle.style("opacity", 0);
+    timelineGroup.style("opacity", 1);
 
     updateTimeline();
 
