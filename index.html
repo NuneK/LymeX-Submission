@@ -1,28 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Scroll Story</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- D3 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+
 <div class="container">
 
-  <!-- Scrolling text -->
-  <div class="scroller">
+    <!-- ==========================
+         LEFT COLUMN (TEXT)
+    =========================== -->
 
-    <section class="step active" data-step="1">
-      <h2>Introduction</h2>
-      <p>Explain the first idea.</p>
-    </section>
+    <div class="scroller">
 
-    <section class="step" data-step="2">
-      <h2>Step Two</h2>
-      <p>Describe what changes.</p>
-    </section>
+        <section class="step active" data-step="1">
+            <h2>Step 1</h2>
 
-    <section class="step" data-step="3">
-      <h2>Conclusion</h2>
-      <p>Wrap everything up.</p>
-    </section>
+            <p>
+                This is the introduction.
+            </p>
+        </section>
 
-  </div>
 
-  <!-- Sticky visualization -->
-  <div class="graphic">
-    <svg id="viz"></svg>
-  </div>
+        <section class="step" data-step="2">
+            <h2>Step 2</h2>
+
+            <p>
+                The circle moves to a new position.
+            </p>
+        </section>
+
+
+        <section class="step" data-step="3">
+
+            <h2>Symptoms Timeline</h2>
+
+            <p>
+                Scroll over the visualization on the right.
+            </p>
+
+            <p>
+                While your mouse is over the visualization,
+                your mouse wheel controls the timeline instead
+                of scrolling the page.
+            </p>
+
+            <p>
+                Move your mouse back over this text to continue
+                scrolling to Step 4.
+            </p>
+
+        </section>
+
+
+        <section class="step" data-step="4">
+
+            <h2>Step 4</h2>
+
+            <p>
+                Final visualization.
+            </p>
+
+        </section>
+
+    </div>
+
+
+    <!-- ==========================
+         RIGHT COLUMN (GRAPHIC)
+    =========================== -->
+
+    <div class="graphic">
+
+        <svg id="viz"></svg>
+
+    </div>
 
 </div>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
