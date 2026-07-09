@@ -13,16 +13,133 @@ body {
     background: white;
 }
 
+/* ==========================
+   INTRO SECTION
+========================== */
+
+.intro {
+
+    height:100vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    padding:40px;
+
+}
+
+
+.intro h1 {
+
+    font-size:4rem;
+
+    margin-bottom:30px;
+
+}
+
+
+.intro p {
+
+    max-width:800px;
+
+    font-size:1.3rem;
+
+    line-height:1.8;
+
+}
+
+/* ==========================
+   INTRO SECTION PT. 2 *************************FIX THIS************************
+========================== */
+
+.section {
+
+    height:100vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    padding:40px;
+
+}
+
+
+.section h1 {
+
+    font-size:4rem;
+
+    margin-bottom:30px;
+
+}
+
+.section h2 {
+
+    font-size:3rem;
+
+    margin-bottom:30px;
+
+}
+
+.section p {
+
+    max-width:800px;
+
+    font-size:1.3rem;
+
+    line-height:1.8;
+
+}
+
 
 /* ==========================
    PAGE LAYOUT
 ========================== */
 
+.section {
+
+    height:20vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    padding:40px;
+
+}
+
+.section p {
+    
+    max-width:800px;
+
+    font-size:1.3rem;
+
+    line-height:1.8;
+}
+
 .container {
     display: flex;
     align-items: flex-start;
 }
-
 
 /* ==========================
    LEFT COLUMN
