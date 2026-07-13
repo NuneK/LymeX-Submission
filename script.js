@@ -111,6 +111,18 @@ function updateGraphic(step) {
 
             break;
 
+            case "1b":
+
+                showCircle();
+
+                circle
+                    .transition()
+                    .duration(600)
+                    .attr("r", 90)
+                    .attr("fill", "tomato");
+
+            break;
+
         case "2":
 
             showCircle();
@@ -174,21 +186,30 @@ const observer = new IntersectionObserver((entries) => {
 
         if (entry.isIntersecting) {
 
-            const step = entry.target.dataset.step;
+    const step = entry.target.dataset.step;
 
-            updateGraphic(step);
+    updateGraphic(step);
 
-            steps.forEach(s => s.classList.remove("active"));
 
-            entry.target.classList.add("active");
+    // ==========================
+    // STEP 1 TEXT CHANGE
+    // ==========================
 
-        }
+    steps.forEach(s => s.classList.remove("active"));
+
+    entry.target.classList.add("active");
+
+}
 
     });
 
 }, {
 
-    threshold: 0.5
+    // Fire the moment a step's midpoint crosses the center of the
+    // viewport, instead of "50% of the element is visible" (which
+    // behaves inconsistently across sections of different heights).
+    threshold: 0,
+    rootMargin: "-50% 0px -50% 0px"
 
 });
 
