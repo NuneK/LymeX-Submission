@@ -66,7 +66,7 @@ let timelineProgress = 0;
 let hoveringGraphic = false;
 
 // =====================================================
-// STEP VISUALS
+// STEP VISUALS - this will need to be replaced with my own animations and drawings
 // =====================================================
 
 function showCircle() {
