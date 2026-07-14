@@ -66,7 +66,7 @@ let timelineProgress = 0;
 let hoveringGraphic = false;
 
 // =====================================================
-// STEP VISUALS - this will need to be replaced with my own animations and drawings
+// STEP VISUALS
 // =====================================================
 
 function showCircle() {
@@ -190,11 +190,6 @@ const observer = new IntersectionObserver((entries) => {
 
     updateGraphic(step);
 
-
-    // ==========================
-    // STEP 1 TEXT CHANGE
-    // ==========================
-
     steps.forEach(s => s.classList.remove("active"));
 
     entry.target.classList.add("active");
@@ -214,6 +209,65 @@ const observer = new IntersectionObserver((entries) => {
 });
 
 steps.forEach(step => observer.observe(step));
+
+// =====================================================
+// STEP 1 SUB-STATE (scroll-driven text fade)
+// =====================================================
+//
+// Step 1 has two paragraphs and two animation states, but they
+// live in the same section so the title never moves. Instead of
+// the main step observer (which only fires once per section),
+// this tracks scroll progress through Step 1 directly and fades
+// the text / advances the graphic once the user has scrolled far
+// enough - and reverts smoothly if they scroll back up.
+
+const stepOneSection = document.querySelector('.step[data-step="1"]');
+const stepOneTexts = stepOneSection.querySelectorAll(".step-text");
+
+// How far through step 1's own scroll range (0 = just arrived,
+// 1 = about to leave) the swap should happen. Adjust this to
+// make the "pause" before the fade longer or shorter.
+const STEP_ONE_SWAP_POINT = 0.4;
+
+let stepOneSubstate = "1";
+
+function setStepOneSubstate(target) {
+
+    if (target === stepOneSubstate) return;
+
+    stepOneSubstate = target;
+
+    if (target === "1b") {
+        stepOneTexts[0].classList.remove("active-text");
+        stepOneTexts[1].classList.add("active-text");
+    } else {
+        stepOneTexts[1].classList.remove("active-text");
+        stepOneTexts[0].classList.add("active-text");
+    }
+
+    // Only drive the graphic here while step 1 is actually the
+    // active step, so this can't fight with the main observer.
+    if (currentStep === "1" || currentStep === "1b") {
+        updateGraphic(target);
+    }
+
+}
+
+function updateStepOneSubstate() {
+
+    const rect = stepOneSection.getBoundingClientRect();
+    const scrollable = rect.height - window.innerHeight;
+
+    if (scrollable <= 0) return;
+
+    const progress = Math.min(1, Math.max(0, -rect.top / scrollable));
+    const target = progress >= STEP_ONE_SWAP_POINT ? "1b" : "1";
+
+    setStepOneSubstate(target);
+
+}
+
+window.addEventListener("scroll", updateStepOneSubstate, { passive: true });
 
 // =====================================================
 // MOUSE POSITION
