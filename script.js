@@ -13,12 +13,32 @@ svg.attr("viewBox", `0 0 ${width} ${height}`);
 // GRAPHIC ELEMENTS
 // =====================================================
 
-// Circle used in Steps 1, 2, and 4
-const circle = svg.append("circle")
-    .attr("cx", width / 2)
-    .attr("cy", height / 2)
-    .attr("r", 50)
-    .attr("fill", "steelblue");
+// Image layers - steps that share a picture reuse the same
+// <image> element and just tween its position/size (like the
+// circle used to). Steps that switch to a different picture
+// crossfade to a different <image> element instead.
+//
+// TODO: point "href" at your actual image files, and add/remove
+// keys here to match however many distinct images you end up with.
+const images = {
+
+    tick: svg.append("image")
+        .attr("href", "images/tick.png")
+        .attr("x", width / 2 - 50)
+        .attr("y", height / 2 - 50)
+        .attr("width", 100)
+        .attr("height", 100)
+        .style("opacity", 0),
+
+    result: svg.append("image")
+        .attr("href", "images/result.png")
+        .attr("x", 520 - 40)
+        .attr("y", 320 - 40)
+        .attr("width", 80)
+        .attr("height", 80)
+        .style("opacity", 0)
+
+};
 
 // Timeline group (used only in Step 3)
 const timelineGroup = svg.append("g")
@@ -69,25 +89,25 @@ let hoveringGraphic = false;
 // STEP VISUALS
 // =====================================================
 
-function showCircle() {
+// All the things that can appear in the graphic panel - every
+// image layer, plus the timeline. Only one is visible at a time.
+const layers = { ...images, timeline: timelineGroup };
 
-    circle.interrupt();
-    timelineGroup.interrupt();
+function showLayer(name) {
 
-    circle.style("opacity", 1);
-    timelineGroup.style("opacity", 0);
+    Object.entries(layers).forEach(([key, layer]) => {
 
-}
+        layer.interrupt();
 
-function showTimeline() {
+        layer.transition()
+            .duration(300)
+            .style("opacity", key === name ? 1 : 0);
 
-    circle.interrupt();
-    timelineGroup.interrupt();
+    });
 
-    circle.style("opacity", 0);
-    timelineGroup.style("opacity", 1);
-
-    updateTimeline();
+    if (name === "timeline") {
+        updateTimeline();
+    }
 
 }
 
@@ -99,61 +119,68 @@ function updateGraphic(step) {
 
         case "1":
 
-            showCircle();
+            // Same image as 1b/2 - just its starting position/size
+            showLayer("tick");
 
-            circle
+            images.tick
                 .transition()
                 .duration(600)
-                .attr("cx", width / 2)
-                .attr("cy", height / 2)
-                .attr("r", 50)
-                .attr("fill", "steelblue");
+                .attr("x", width / 2 - 50)
+                .attr("y", height / 2 - 50)
+                .attr("width", 100)
+                .attr("height", 100);
 
             break;
 
-            case "1b":
+        case "1b":
 
-                showCircle();
+            // Same "tick" image as step 1 - no crossfade needed,
+            // it just grows in place.
+            showLayer("tick");
 
-                circle
-                    .transition()
-                    .duration(600)
-                    .attr("r", 90)
-                    .attr("fill", "tomato");
+            images.tick
+                .transition()
+                .duration(600)
+                .attr("x", width / 2 - 80)
+                .attr("y", height / 2 - 80)
+                .attr("width", 160)
+                .attr("height", 160);
 
             break;
 
         case "2":
 
-            showCircle();
+            // Still the "tick" image - moves and grows further
+            showLayer("tick");
 
-            circle
+            images.tick
                 .transition()
                 .duration(600)
-                .attr("cx", 200)
-                .attr("cy", 180)
-                .attr("r", 90)
-                .attr("fill", "tomato");
+                .attr("x", 200 - 80)
+                .attr("y", 180 - 80)
+                .attr("width", 160)
+                .attr("height", 160);
 
             break;
 
         case "3":
 
-            showTimeline();
+            showLayer("timeline");
 
             break;
 
         case "4":
 
-            showCircle();
+            // Different image from steps 1/1b/2 - crossfades in
+            showLayer("result");
 
-            circle
+            images.result
                 .transition()
                 .duration(600)
-                .attr("cx", 520)
-                .attr("cy", 320)
-                .attr("r", 40)
-                .attr("fill", "seagreen");
+                .attr("x", 520 - 40)
+                .attr("y", 320 - 40)
+                .attr("width", 80)
+                .attr("height", 80);
 
             break;
 
