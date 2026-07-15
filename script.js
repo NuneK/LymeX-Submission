@@ -24,19 +24,23 @@ const images = {
 
     tick: svg.append("image")
         .attr("href", "images/tick.png")
+        .attr("xlink:href", "images/tick.png")
         .attr("x", width / 2 - 50)
         .attr("y", height / 2 - 50)
         .attr("width", 100)
         .attr("height", 100)
-        .style("opacity", 0),
+        .style("opacity", 0)
+        .on("error", () => console.error("Image failed to load: images/tick.png - check the path/filename")),
 
     result: svg.append("image")
         .attr("href", "images/result.png")
+        .attr("xlink:href", "images/result.png")
         .attr("x", 520 - 40)
         .attr("y", 320 - 40)
         .attr("width", 80)
         .attr("height", 80)
         .style("opacity", 0)
+        .on("error", () => console.error("Image failed to load: images/result.png - check the path/filename"))
 
 };
 
@@ -97,9 +101,12 @@ function showLayer(name) {
 
     Object.entries(layers).forEach(([key, layer]) => {
 
-        layer.interrupt();
+        // Named "opacity" so this doesn't collide with (and get
+        // cancelled by) the separate position/size transition each
+        // step case runs on the same element right after this.
+        layer.interrupt("opacity");
 
-        layer.transition()
+        layer.transition("opacity")
             .duration(300)
             .style("opacity", key === name ? 1 : 0);
 
