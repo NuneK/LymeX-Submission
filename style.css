@@ -130,11 +130,11 @@ body {
     transition: 0.3s;
 }
 
-/* Step 1 hosts two paragraph states that fade between each other
-   mid-scroll, so it gets extra scroll runway: room for the pause,
-   the fade, and a beat to read the new text before advancing. */
+/* Step 1 hosts three paragraph states that fade between each
+   other mid-scroll, so it gets extra scroll runway: room for
+   the pause, the fade, and a beat to read each chunk of text. */
 .step[data-step="1"] {
-    min-height: 180vh;
+    min-height: 260vh;
 }
 
 .sticky-step-text {
@@ -203,17 +203,25 @@ body {
 ========================== */
 
 .graphic {
+
     width: 60%;
+
     position: sticky;
+
     top: 0;
+
     height: 100vh;
 
     display: flex;
+
     justify-content: center;
+
     align-items: center;
 
-    background: transparent;
-    border-left: none;
+    background: #f5f5f5;
+
+    border-left: 1px solid #ddd;
+
 }
 
 
@@ -221,13 +229,96 @@ body {
    VISUALIZATION CARD
 ========================== */
 
-.hero-image {
-    width: 80%;
-    max-width: 650px;
-    height: auto;
-    object-fit: contain;
+#viz {
+
+    width: 85%;
+
+    height: 80%;
+
+    background: white;
+
+    border: 1px solid #d9d9d9;
+
+    border-radius: 14px;
+
+    box-shadow: 0 8px 30px rgba(0,0,0,.08);
+
 }
 
+
+/* ==========================
+   HERO IMAGE + MARKERS
+========================== */
+
+/* Scaling the wrapper (not just the image) shrinks the image
+   AND moves the markers with it, so the dots stay pinned to the
+   same spot on the picture at any scale. */
+.image-wrapper {
+
+    position: relative;
+
+    display: inline-block;
+
+    transform: scale(0.5);
+
+    transform-origin: center center;
+
+}
+
+.hero-image {
+
+    display: block;
+
+    max-width: 100%;
+
+    height: auto;
+
+}
+
+.marker {
+
+    position: absolute;
+
+    width: 16px;
+
+    height: 16px;
+
+    border-radius: 50%;
+
+    background: #e63946;
+
+    box-shadow: 0 0 0 5px rgba(230, 57, 70, 0.25);
+
+    transform: translate(-50%, -50%) scale(0.5);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity 0.4s ease, transform 0.4s ease;
+
+}
+
+.marker.visible {
+
+    opacity: 1;
+
+    transform: translate(-50%, -50%) scale(1);
+
+}
+
+/* Placeholder positions - move these to line up with the actual
+   points of interest on symptoms.png */
+#m1 { top: 20%; left: 30%; }
+#m2 { top: 28%; left: 65%; }
+#m3 { top: 40%; left: 25%; }
+#m4 { top: 48%; left: 72%; }
+#m5 { top: 58%; left: 38%; }
+#m6 { top: 62%; left: 60%; }
+#m7 { top: 75%; left: 32%; }
+#m8 { top: 80%; left: 68%; }
+#m9 { top: 15%; left: 50%; }
+#m10 { top: 88%; left: 50%; }
 
 /* ==========================
    ACTIVE STEP HIGHLIGHT
