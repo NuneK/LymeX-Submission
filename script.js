@@ -149,7 +149,7 @@ const zoomScene = document.querySelector(".zoom-scene");
 const zoomSymptoms = document.querySelector(".zoom-symptoms");
 const zoomGrass = document.querySelector(".zoom-grass");
 
-const ZOOM_SCALE = 3.4;   // how "zoomed in" symptoms.png looks at its biggest
+const ZOOM_SCALE = 5;   // how "zoomed in" symptoms.png looks at its biggest
 const REST_SCALE = 1;     // its normal, un-zoomed size
 
 function clamp(value, min, max) {
