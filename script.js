@@ -146,11 +146,13 @@ function refresh() {
 // tracks the scrollbar exactly, in both directions.
 
 const zoomScene = document.querySelector(".zoom-scene");
+const zoomStage = document.querySelector(".zoom-stage");
 const zoomSymptoms = document.querySelector(".zoom-symptoms");
 const zoomGrass = document.querySelector(".zoom-grass");
+const graphicEl = document.querySelector(".graphic");
+const heroImage = document.querySelector(".hero-image");
 
 const ZOOM_SCALE = 5;   // how "zoomed in" symptoms.png looks at its biggest
-const REST_SCALE = 1;     // its normal, un-zoomed size
 
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
@@ -160,8 +162,57 @@ function lerp(from, to, t) {
     return from + (to - from) * t;
 }
 
+// =====================================================
+// LANDING SPOT
+// =====================================================
+//
+// symptoms.png needs to shrink down onto exactly the spot where
+// hero-image already lives in the sidebar, so the handoff between
+// the two reads as one continuous image instead of a jump cut.
+//
+// baseWidth/baseHeight: symptoms.png's own rendered size at scale 1
+// (its plain width:32vw / max-width:420px box).
+//
+// landing: the on-screen point + scale symptoms.png needs to reach
+// so it lines up with hero-image. This tracks the same bottom-edge
+// anchor point used during the zoom-in phase (see updateZoomScene),
+// not hero-image's center. On desktop the sidebar is a full-height
+// sticky column, so once pinned its vertical center always sits at
+// the viewport's vertical center - that's true no matter where we
+// are on the page right now, which lets us compute the landing spot
+// up front instead of only once we've scrolled there. On mobile the
+// sidebar isn't sticky, so we fall back to its current measured
+// position instead.
+
+let baseWidth = 0;
+let baseHeight = 0;
+let landing = { x: 0, y: 0, scale: 1 };
+
+function measureLanding() {
+
+    const prevTransform = zoomSymptoms.style.transform;
+    zoomSymptoms.style.transform = "none";
+    baseWidth = zoomSymptoms.offsetWidth;
+    baseHeight = zoomSymptoms.offsetHeight;
+    zoomSymptoms.style.transform = prevTransform;
+
+    const heroRect = heroImage.getBoundingClientRect();
+    const graphicRect = graphicEl.getBoundingClientRect();
+    const graphicIsSticky = getComputedStyle(graphicEl).position === "sticky";
+
+    landing = {
+        x: graphicRect.left + graphicRect.width / 2,
+        y: graphicIsSticky
+            ? window.innerHeight / 2 + heroRect.height / 2
+            : heroRect.bottom,
+        scale: baseWidth ? heroRect.width / baseWidth : 1
+    };
+
+}
+
 function updateZoomScene() {
 
+    const stageRect = zoomStage.getBoundingClientRect();
     const rect = zoomScene.getBoundingClientRect();
     const scrollable = rect.height - window.innerHeight;
 
@@ -169,9 +220,15 @@ function updateZoomScene() {
 
     const progress = clamp(-rect.top / scrollable, 0, 1);
 
+    // Both images are positioned from this same center point while
+    // fading in together, so they read as one aligned image instead
+    // of two layers drifting independently.
+    const centerX = stageRect.width / 2;
+    const centerY = stageRect.height / 2;
+
     let symptomsOpacity;
     let grassOpacity;
-    let scale;
+    let x, y, scale;
 
     if (progress <= 0.5) {
 
@@ -179,6 +236,9 @@ function updateZoomScene() {
 
         symptomsOpacity = p;
         grassOpacity = p;
+
+        x = centerX;
+        y = centerY;
         scale = ZOOM_SCALE;
 
     } else {
@@ -187,12 +247,23 @@ function updateZoomScene() {
 
         symptomsOpacity = 1;
         grassOpacity = 1 - p;
-        scale = lerp(ZOOM_SCALE, REST_SCALE, p);
+
+        // landing.x/y were measured in viewport coordinates; convert
+        // into the stage's own coordinate space. These match while
+        // the stage is pinned, but this keeps it correct even when
+        // it isn't (e.g. very short viewports).
+        const landingX = landing.x - stageRect.left;
+        const landingY = landing.y - stageRect.top;
+
+        x = lerp(centerX, landingX, p);
+        y = lerp(centerY, landingY, p);
+        scale = lerp(ZOOM_SCALE, landing.scale, p);
 
     }
 
     zoomSymptoms.style.opacity = symptomsOpacity;
-    zoomSymptoms.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    zoomSymptoms.style.transform =
+        `translate(${x}px, ${y}px) translate(-50%, -100%) scale(${scale})`;
 
     zoomGrass.style.opacity = grassOpacity;
 
@@ -218,9 +289,40 @@ window.addEventListener("scroll", () => {
 
 }, { passive: true });
 
+let resizeTicking = false;
+
+window.addEventListener("resize", () => {
+
+    if (resizeTicking) return;
+
+    resizeTicking = true;
+
+    requestAnimationFrame(() => {
+        measureLanding();
+        updateZoomScene();
+        resizeTicking = false;
+    });
+
+});
+
+// Image dimensions (and therefore the landing spot) aren't reliable
+// until both images have actually loaded, so re-measure once they
+// have in addition to the upfront measurement below.
+[zoomSymptoms, heroImage].forEach(img => {
+    if (img.complete) {
+        measureLanding();
+    } else {
+        img.addEventListener("load", () => {
+            measureLanding();
+            updateZoomScene();
+        });
+    }
+});
+
 // =====================================================
 // INITIALIZE
 // =====================================================
 
+measureLanding();
 refresh();
 updateZoomScene();

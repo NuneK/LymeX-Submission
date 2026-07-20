@@ -119,7 +119,8 @@ body {
     position: sticky;
     top: 0;
     height: 100vh;
-    overflow: hidden;
+    overflow: hidden
+;
 
     display: flex;
     justify-content: center;
@@ -129,24 +130,37 @@ body {
 .zoom-symptoms,
 .zoom-grass {
     position: absolute;
-    top: 50%;
-    left: 50%;
 }
 
 .zoom-symptoms {
+    top: 0;
+    left: 0;
     width: 32vw;
     max-width: 420px;
     opacity: 0;
-    transform-origin: 50% 97%;
-    /* transform is set in JS (translate for centering + scroll-driven scale) */
+    transform-origin: 47% 86.8%;
+    /* position + scale are driven frame-by-frame from script.js,
+       which anchors this by its bottom edge (not its center) so
+       zooming in reveals the bottom of the image, then animates
+       it off toward the sidebar image's landing spot. */
 }
 
 .zoom-grass {
-    width: 75%;
-    height: 75%;
-    object-fit: cover;
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width: 80%;
+    height: 80%;
+
+    object-fit: contain;
+
+    transform: translate(-50%, -50%);
+    transform-origin: 55% 50%;
+
     opacity: 0;
-    transform: translate(-56%, -38%);
+
     pointer-events: none;
 }
 
