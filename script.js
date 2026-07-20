@@ -134,6 +134,71 @@ function refresh() {
 }
 
 // =====================================================
+// ZOOM TRANSITION SCENE
+// =====================================================
+//
+// Two phases across this section's own scroll range:
+//   0.0 - 0.5  symptoms.png (zoomed in) + grass.png fade in together
+//   0.5 - 1.0  grass.png fades back out while symptoms.png shrinks
+//              from its zoomed-in scale down to its resting size
+//
+// Driven directly off scroll position (not CSS transitions) so it
+// tracks the scrollbar exactly, in both directions.
+
+const zoomScene = document.querySelector(".zoom-scene");
+const zoomSymptoms = document.querySelector(".zoom-symptoms");
+const zoomGrass = document.querySelector(".zoom-grass");
+
+const ZOOM_SCALE = 3.4;   // how "zoomed in" symptoms.png looks at its biggest
+const REST_SCALE = 1;     // its normal, un-zoomed size
+
+function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+}
+
+function lerp(from, to, t) {
+    return from + (to - from) * t;
+}
+
+function updateZoomScene() {
+
+    const rect = zoomScene.getBoundingClientRect();
+    const scrollable = rect.height - window.innerHeight;
+
+    if (scrollable <= 0) return;
+
+    const progress = clamp(-rect.top / scrollable, 0, 1);
+
+    let symptomsOpacity;
+    let grassOpacity;
+    let scale;
+
+    if (progress <= 0.5) {
+
+        const p = progress / 0.5;
+
+        symptomsOpacity = p;
+        grassOpacity = p;
+        scale = ZOOM_SCALE;
+
+    } else {
+
+        const p = (progress - 0.5) / 0.5;
+
+        symptomsOpacity = 1;
+        grassOpacity = 1 - p;
+        scale = lerp(ZOOM_SCALE, REST_SCALE, p);
+
+    }
+
+    zoomSymptoms.style.opacity = symptomsOpacity;
+    zoomSymptoms.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+    zoomGrass.style.opacity = grassOpacity;
+
+}
+
+// =====================================================
 // SCROLL BINDING
 // =====================================================
 
@@ -147,6 +212,7 @@ window.addEventListener("scroll", () => {
 
     requestAnimationFrame(() => {
         refresh();
+        updateZoomScene();
         ticking = false;
     });
 
@@ -157,3 +223,4 @@ window.addEventListener("scroll", () => {
 // =====================================================
 
 refresh();
+updateZoomScene();
