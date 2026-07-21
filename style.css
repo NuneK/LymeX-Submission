@@ -211,6 +211,26 @@ body {
 
     top: 0;
 
+    /* Deliberately no z-index here. A positioned element only forms
+       a new stacking context once z-index is explicitly set (even
+       to 0) - and .graphic having one was the actual bug: it sealed
+       .marker's z-index:10 inside .graphic's own local context, so
+       that 10 could only ever win against other things inside
+       .graphic, never against .zoom-symptoms/.zoom-symptomgrass
+       (z-index 5/6), which live outside .graphic as fixed-position
+       siblings.
+
+       With z-index left auto, .graphic no longer creates a
+       stacking context, so its child .image-wrapper (which DOES
+       have its own explicit z-index: 10, see below) escapes
+       upward into the *root* stacking context instead - where it
+       now directly outranks the zoom overlays (5/6). Meanwhile
+       .graphic's green background, having no z-index of its own,
+       stays at the lower "positioned, z-index:auto" paint layer,
+       below both zoom overlays. Net effect: green panel (bottom),
+       landed symptoms.png (middle), markers via image-wrapper
+       (top). */
+
     height: 100vh;
 
     display: flex;
@@ -264,6 +284,8 @@ body {
 
     transform-origin: center center;
 
+    z-index: 10;
+
 }
 
 .hero-image {
@@ -287,6 +309,8 @@ body {
 
     position: absolute;
 
+    z-index: 10;
+
     width: 16px;
 
     height: 16px;
@@ -309,6 +333,8 @@ body {
 
 .marker.visible {
 
+    z-index: 10;
+
     opacity: 1;
 
     transform: translate(-50%, -50%) scale(1);
@@ -317,16 +343,42 @@ body {
 
 /* Placeholder positions - move these to line up with the actual
    points of interest on symptoms.png */
-#m1 { top: 20%; left: 30%; }
-#m2 { top: 28%; left: 65%; }
-#m3 { top: 40%; left: 25%; }
-#m4 { top: 48%; left: 72%; }
-#m5 { top: 58%; left: 38%; }
-#m6 { top: 62%; left: 60%; }
-#m7 { top: 75%; left: 32%; }
-#m8 { top: 80%; left: 68%; }
-#m9 { top: 15%; left: 50%; }
-#m10 { top: 88%; left: 50%; }
+
+/* "Especially during summer and fall..." - 7 markers */
+#m-1a-1 { top: 52%; left: 32%; }
+#m-1a-2 { top: 53%; left: 32%; }
+#m-1a-3 { top: 54%; left: 32%; }
+#m-1a-4 { top: 55%; left: 32%; }
+#m-1a-5 { top: 56%; left: 32%; }
+#m-1a-6 { top: 57%; left: 32%; }
+#m-1a-7 { top: 58%; left: 32%; }
+
+/* "If you find a tick, remove it..." - 5 markers */
+#m-1b-1 { top: 58%; left: 35%; }
+#m-1b-2 { top: 58%; left: 65%; }
+#m-1b-3 { top: 68%; left: 50%; }
+#m-1b-4 { top: 78%; left: 32%; }
+#m-1b-5 { top: 78%; left: 68%; }
+
+/* "Long Lyme is a serious condition..." - 6 markers */
+#m-1c-1 { top: 75%; left: 60%; }
+#m-1c-2 { top: 77%; left: 60%; }
+#m-1c-3 { top: 79%; left: 60%; }
+#m-1c-4 { top: 81%; left: 60%; }
+#m-1c-5 { top: 83%; left: 60%; }
+#m-1c-6 { top: 85%; left: 60%; }
+
+/* Step 2 */
+#m-2-1 { top: 40%; left: 25%; }
+#m-2-2 { top: 48%; left: 72%; }
+
+/* Step 3 */
+#m-3-1 { top: 58%; left: 38%; }
+#m-3-2 { top: 62%; left: 60%; }
+
+/* Step 4 */
+#m-4-1 { top: 75%; left: 32%; }
+#m-4-2 { top: 80%; left: 68%; }
 
 /* ==========================
    ACTIVE STEP HIGHLIGHT

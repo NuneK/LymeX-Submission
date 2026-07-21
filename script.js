@@ -3,11 +3,12 @@
 // =====================================================
 
 const sectionMarkers = {
-    "1": ["m1", "m2"],
-    "1c": ["m9", "m10"],
-    "2": ["m3", "m4"],
-    "3": ["m5", "m6"],
-    "4": ["m7", "m8"]
+    "1a": ["m-1a-1", "m-1a-2", "m-1a-3", "m-1a-4", "m-1a-5", "m-1a-6", "m-1a-7"],
+    "1b": ["m-1b-1", "m-1b-2", "m-1b-3", "m-1b-4", "m-1b-5"],
+    "1c": ["m-1c-1", "m-1c-2", "m-1c-3", "m-1c-4", "m-1c-5", "m-1c-6"],
+    "2": ["m-2-1", "m-2-2"],
+    "3": ["m-3-1", "m-3-2"],
+    "4": ["m-4-1", "m-4-2"]
 };
 
 // =====================================================
@@ -109,9 +110,9 @@ function refresh() {
     activeEl.classList.add("active");
     currentStep = activeEl.dataset.step;
 
-    // Markers for step 1: the first two text chunks still share
-    // the original pair (m1/m2); only the new third chunk swaps
-    // in its own pair (m9/m10).
+    // Markers for step 1: each of the three text chunks now has
+    // its own independent marker set (1a/1b/1c), rather than the
+    // first two sharing one.
     let markerKey = currentStep;
 
     if (currentStep === "1") {
@@ -122,7 +123,7 @@ function refresh() {
         stepOneTexts[1].classList.toggle("active-text", substate === "1b");
         stepOneTexts[2].classList.toggle("active-text", substate === "1c");
 
-        markerKey = substate === "1c" ? "1c" : "1";
+        markerKey = substate;
 
     }
 
