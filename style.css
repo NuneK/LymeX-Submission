@@ -10,7 +10,7 @@ body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     color: #333;
-    background: rgb(110, 144,87);
+    background: rgb(92, 144, 87);
 }
 
 .sticky-text {
@@ -296,11 +296,16 @@ body {
 
     height: auto;
 
-    /* Never actually shown - script.js's zoom-symptoms overlay
-       shrinks from center-screen and lands exactly on top of this
-       spot, then just stays there. This element exists purely to
-       reserve that spot's size/position (for measureLanding() and
-       for the markers below, which are positioned relative to it). */
+    /* Hidden by default (and the only thing measureLanding() reads
+       from while hidden, to reserve this spot's size/position for
+       both the incoming zoom overlay and the markers below). Once
+       the zoom-in animation finishes landing, script.js sets this
+       to opacity: 1 and hides the fixed .zoom-symptoms overlay in
+       the same frame - handing off to this image instead, since it
+       lives inside .image-wrapper alongside the markers and so
+       stacks against them directly, rather than needing its
+       z-index compared against a fixed-position element in a
+       different stacking context. */
     opacity: 0;
 
 }

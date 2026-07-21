@@ -40,10 +40,12 @@
      MAIN SCROLL STORY
      The zoom-in intro (symptoms.png + grass.png) plays as overlays
      fixed to the viewport, then shrinks down onto the sidebar's
-     reserved spot and stays there - the sidebar itself never shows
-     its own copy of the image (hero-image is invisible, kept only
-     to define that spot's size/position and to anchor the
-     markers). zoom-spacer just reserves the scroll distance the
+     reserved spot. The instant it fully lands, script.js hides
+     those fixed overlays and reveals hero-image in their place -
+     hero-image lives inside .image-wrapper alongside the markers,
+     so its stacking order compares directly against theirs instead
+     of fighting a fixed-position element in a separate stacking
+     context. zoom-spacer just reserves the scroll distance the
      zoom animation plays across.
 =========================== -->
 
@@ -185,10 +187,11 @@
 <!-- ==========================
      ZOOM-IN OVERLAY
      Fixed to the viewport (not confined to the sidebar column) so
-     it can play large and centered, then shrink and land in the
-     sidebar's reserved spot (over the invisible hero-image below)
-     and stay there - it's the only symptoms.png that's ever
-     actually visible.
+     it can play large and centered, then shrink toward the
+     sidebar's reserved spot. The instant it fully lands, script.js
+     hides both of these and reveals hero-image instead (see
+     .hero-image in style.css) - so from that point on, the visible
+     image lives in the same stacking context as the markers.
 =========================== -->
 
 <img src="images/symptoms.png" class="zoom-symptoms" alt="">

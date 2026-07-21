@@ -261,10 +261,30 @@ function updateZoomScene() {
     if (rect.top > 0) {
         zoomSymptoms.style.opacity = 0;
         zoomSymptomgrass.style.opacity = 0;
+        heroImage.style.opacity = 0;
         return;
     }
 
     const progress = clamp(-rect.top / scrollable, 0, 1);
+
+    // Once fully landed, hand off from the fixed-position zoom
+    // overlay to the in-place hero-image instead of continuing to
+    // reposition the overlay every frame. hero-image lives inside
+    // .image-wrapper - the same local stacking context as the
+    // .marker elements - so from this point on its z-index actually
+    // gets compared against the markers' directly, rather than
+    // fighting a fixed-position element in a different stacking
+    // context. Because measureLanding() sized/positioned the
+    // overlay to exactly match heroImage's own rect, this swap
+    // lands on the identical pixels and reads as instantaneous.
+    if (progress >= 1) {
+        zoomSymptoms.style.opacity = 0;
+        zoomSymptomgrass.style.opacity = 0;
+        heroImage.style.opacity = 1;
+        return;
+    }
+
+    heroImage.style.opacity = 0;
 
     // Both overlays are pre-aligned to the same canvas, so they
     // always get the identical box - x is the shared horizontal
