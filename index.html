@@ -61,25 +61,14 @@
 </section>
 
 <!-- ==========================
-     ZOOM TRANSITION
-     Scrolling through this pins a large, zoomed-in symptoms.png
-     with grass.png overlaid, fading into view - then on the back
-     half, the grass fades out while symptoms.png shrinks back
-     down to its normal size, handing off to the sidebar image
-     in the section below.
-=========================== -->
-
-<section class="zoom-scene">
-    <div class="zoom-stage">
-
-        <img src="images/symptoms.png" class="zoom-symptoms" alt="">
-        <img src="images/grass.png" class="zoom-grass" alt="">
-
-    </div>
-</section>
-
-<!-- ==========================
      MAIN SCROLL STORY
+     The zoom-in intro (symptoms.png + grass.png) plays as overlays
+     fixed to the viewport, then shrinks down onto the sidebar's
+     reserved spot and stays there - the sidebar itself never shows
+     its own copy of the image (hero-image is invisible, kept only
+     to define that spot's size/position and to anchor the
+     markers). zoom-spacer just reserves the scroll distance the
+     zoom animation plays across.
 =========================== -->
 
 <div class="container">
@@ -90,6 +79,7 @@
 
     <div class="scroller">
 
+<div class="zoom-spacer"></div>
 
 <section class="step active" data-step="1">
 
@@ -191,7 +181,17 @@
 
 </div>
 
-</div>
+<!-- ==========================
+     ZOOM-IN OVERLAY
+     Fixed to the viewport (not confined to the sidebar column) so
+     it can play large and centered, then shrink and land in the
+     sidebar's reserved spot (over the invisible hero-image below)
+     and stay there - it's the only symptoms.png that's ever
+     actually visible.
+=========================== -->
+
+<img src="images/symptoms.png" class="zoom-symptoms" alt="">
+<img src="images/symptomgrass.png" class="zoom-symptomgrass" alt="">
 
 
 <script src="script.js"></script>

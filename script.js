@@ -134,25 +134,56 @@ function refresh() {
 }
 
 // =====================================================
-// ZOOM TRANSITION SCENE
+// ZOOM-IN INTRO
 // =====================================================
 //
-// Two phases across this section's own scroll range:
-//   0.0 - 0.5  symptoms.png (zoomed in) + grass.png fade in together
-//   0.5 - 1.0  grass.png fades back out while symptoms.png shrinks
-//              from its zoomed-in scale down to its resting size
+// symptomgrass.png (person + grass, pre-aligned by hand onto the
+// same canvas as symptoms.png) and symptoms.png (person only) play
+// as fixed-to-viewport overlays. They shrink and land in the
+// sidebar's reserved spot (where the invisible hero-image sits,
+// used only to define that spot's size/position) and then just
+// stay there - symptoms.png is the only image that's ever actually
+// visible on the right side of the screen.
+//
+// Because the two images are pre-aligned to the same canvas, they
+// always share one box - same left/top/width every frame. That
+// makes the first phase a plain crossfade in place, which is what
+// makes it read as "the grass fading in, then away" rather than
+// two images sliding around independently:
+//
+//   0.00 - 0.25  shared box holds at center-screen, zoomed in.
+//                symptomgrass.png (on top) fades from fully
+//                transparent to fully opaque, over symptoms.png
+//                (underneath, always fully opaque once this phase
+//                starts).
+//   0.25 - 0.5   still held in place; symptomgrass.png now fades
+//                from opaque back to transparent, revealing the
+//                person already standing there underneath.
+//   0.5  - 1.0   symptomgrass.png is fully gone. Only now does
+//                symptoms.png shrink and travel from center-screen
+//                onto the sidebar's reserved spot, landing exactly
+//                on it and staying there.
+//
+// Before the spacer has actually been scrolled to, both overlays
+// are kept fully hidden rather than sitting at their progress=0
+// state - see the early-return in updateZoomScene() below.
 //
 // Driven directly off scroll position (not CSS transitions) so it
 // tracks the scrollbar exactly, in both directions.
 
-const zoomScene = document.querySelector(".zoom-scene");
-const zoomStage = document.querySelector(".zoom-stage");
+const zoomSpacer = document.querySelector(".zoom-spacer");
 const zoomSymptoms = document.querySelector(".zoom-symptoms");
-const zoomGrass = document.querySelector(".zoom-grass");
+const zoomSymptomgrass = document.querySelector(".zoom-symptomgrass");
 const graphicEl = document.querySelector(".graphic");
 const heroImage = document.querySelector(".hero-image");
 
 const ZOOM_SCALE = 5;   // how "zoomed in" symptoms.png looks at its biggest
+
+// symptomgrass.png's opacity arc within the first half of the
+// zoom sequence: invisible -> fades in to full opacity -> fades
+// back out. Expressed as fractions of total scroll progress (0-1).
+const GRASS_FADE_IN_END = 0.25;
+const GRASS_FADE_OUT_END = 0.5;
 
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
@@ -162,110 +193,134 @@ function lerp(from, to, t) {
     return from + (to - from) * t;
 }
 
-// =====================================================
-// LANDING SPOT
-// =====================================================
+// ---- Landing spot ----
 //
-// symptoms.png needs to shrink down onto exactly the spot where
-// hero-image already lives in the sidebar, so the handoff between
-// the two reads as one continuous image instead of a jump cut.
+// symptoms.png needs to shrink down onto exactly the spot reserved
+// by the invisible hero-image in the sidebar, and then just stay
+// there - so it reads as arriving at its final position rather than
+// shrinking indefinitely or overshooting.
 //
-// baseWidth/baseHeight: symptoms.png's own rendered size at scale 1
-// (its plain width:32vw / max-width:420px box).
+// baseWidth: symptoms.png's own rendered width at scale 1 (mirrors
+// the 32vw / 420px cap it used to have in CSS).
+// baseAspect: its natural height/width ratio, used to derive height
+// from width at any scale.
 //
 // landing: the on-screen point + scale symptoms.png needs to reach
-// so it lines up with hero-image. This tracks the same bottom-edge
-// anchor point used during the zoom-in phase (see updateZoomScene),
-// not hero-image's center. On desktop the sidebar is a full-height
-// sticky column, so once pinned its vertical center always sits at
-// the viewport's vertical center - that's true no matter where we
-// are on the page right now, which lets us compute the landing spot
-// up front instead of only once we've scrolled there. On mobile the
-// sidebar isn't sticky, so we fall back to its current measured
-// position instead.
+// to line up with the reserved spot. On desktop the sidebar is a
+// full-height sticky column, so once pinned its vertical center
+// always sits at the viewport's vertical center - true no matter
+// where we are on the page right now, which lets us compute the
+// landing spot up front. On mobile the sidebar isn't sticky, so we
+// fall back to its current measured position instead.
 
 let baseWidth = 0;
-let baseHeight = 0;
-let landing = { x: 0, y: 0, scale: 1 };
+let baseAspect = 1;
+let landing = { x: 0, bottomY: 0, scale: 1 };
 
 function measureLanding() {
 
-    const prevTransform = zoomSymptoms.style.transform;
-    zoomSymptoms.style.transform = "none";
-    baseWidth = zoomSymptoms.offsetWidth;
-    baseHeight = zoomSymptoms.offsetHeight;
-    zoomSymptoms.style.transform = prevTransform;
+    baseWidth = Math.min(window.innerWidth * 0.32, 420);
+
+    if (zoomSymptoms.naturalWidth) {
+        baseAspect = zoomSymptoms.naturalHeight / zoomSymptoms.naturalWidth;
+    }
 
     const heroRect = heroImage.getBoundingClientRect();
     const graphicRect = graphicEl.getBoundingClientRect();
     const graphicIsSticky = getComputedStyle(graphicEl).position === "sticky";
 
+    const targetWidth = heroRect.width;
+    const targetHeight = heroRect.height;
+
+    const landingCenterY = graphicIsSticky
+        ? window.innerHeight / 2
+        : heroRect.top + heroRect.height / 2;
+
     landing = {
         x: graphicRect.left + graphicRect.width / 2,
-        y: graphicIsSticky
-            ? window.innerHeight / 2 + heroRect.height / 2
-            : heroRect.bottom,
-        scale: baseWidth ? heroRect.width / baseWidth : 1
+        bottomY: landingCenterY + targetHeight / 2,
+        scale: baseWidth ? targetWidth / baseWidth : 1
     };
 
 }
 
 function updateZoomScene() {
 
-    const stageRect = zoomStage.getBoundingClientRect();
-    const rect = zoomScene.getBoundingClientRect();
+    const rect = zoomSpacer.getBoundingClientRect();
     const scrollable = rect.height - window.innerHeight;
 
     if (scrollable <= 0) return;
 
+    // Before the spacer's top has actually reached the viewport
+    // top, the zoom sequence hasn't started yet - the user is
+    // still on an earlier section (intro, map, etc.). Progress
+    // would otherwise clamp to 0 here, which put both overlays at
+    // full-size/center-screen opacity the whole time before the
+    // user ever scrolled this far. Keep them fully hidden instead.
+    if (rect.top > 0) {
+        zoomSymptoms.style.opacity = 0;
+        zoomSymptomgrass.style.opacity = 0;
+        return;
+    }
+
     const progress = clamp(-rect.top / scrollable, 0, 1);
 
-    // Both images are positioned from this same center point while
-    // fading in together, so they read as one aligned image instead
-    // of two layers drifting independently.
-    const centerX = stageRect.width / 2;
-    const centerY = stageRect.height / 2;
+    // Both overlays are pre-aligned to the same canvas, so they
+    // always get the identical box - x is the shared horizontal
+    // center, groundY is the y-coordinate their bottom edges sit on.
+    const centerX = window.innerWidth / 2;
+    const groundY = window.innerHeight / 2;
 
-    let symptomsOpacity;
-    let grassOpacity;
-    let x, y, scale;
+    let symptomgrassOpacity;
+    let x, bottomY, scale;
 
-    if (progress <= 0.5) {
+    if (progress <= GRASS_FADE_OUT_END) {
 
-        const p = progress / 0.5;
-
-        symptomsOpacity = p;
-        grassOpacity = p;
-
+        // Held at center-screen, zoomed in, while symptomgrass.png
+        // plays its opacity arc on top of symptoms.png (underneath,
+        // always fully opaque): fades in from nothing, then - once
+        // fully visible - fades back out to reveal the person
+        // already standing there.
         x = centerX;
-        y = centerY;
+        bottomY = groundY;
         scale = ZOOM_SCALE;
+
+        if (progress <= GRASS_FADE_IN_END) {
+            symptomgrassOpacity = progress / GRASS_FADE_IN_END;
+        } else {
+            const p = (progress - GRASS_FADE_IN_END) / (GRASS_FADE_OUT_END - GRASS_FADE_IN_END);
+            symptomgrassOpacity = 1 - p;
+        }
 
     } else {
 
-        const p = (progress - 0.5) / 0.5;
+        // symptomgrass.png is fully gone - now symptoms.png alone
+        // shrinks and travels onto its landing spot in the sidebar,
+        // where it stays once it arrives (progress clamps at 1).
+        const p = (progress - GRASS_FADE_OUT_END) / (1 - GRASS_FADE_OUT_END);
 
-        symptomsOpacity = 1;
-        grassOpacity = 1 - p;
+        symptomgrassOpacity = 0;
 
-        // landing.x/y were measured in viewport coordinates; convert
-        // into the stage's own coordinate space. These match while
-        // the stage is pinned, but this keeps it correct even when
-        // it isn't (e.g. very short viewports).
-        const landingX = landing.x - stageRect.left;
-        const landingY = landing.y - stageRect.top;
-
-        x = lerp(centerX, landingX, p);
-        y = lerp(centerY, landingY, p);
+        x = lerp(centerX, landing.x, p);
+        bottomY = lerp(groundY, landing.bottomY, p);
         scale = lerp(ZOOM_SCALE, landing.scale, p);
 
     }
 
-    zoomSymptoms.style.opacity = symptomsOpacity;
-    zoomSymptoms.style.transform =
-        `translate(${x}px, ${y}px) translate(-50%, -100%) scale(${scale})`;
+    const width = baseWidth * scale;
+    const height = width * baseAspect;
+    const left = `${x - width / 2}px`;
+    const top = `${bottomY - height}px`;
 
-    zoomGrass.style.opacity = grassOpacity;
+    zoomSymptoms.style.width = `${width}px`;
+    zoomSymptoms.style.left = left;
+    zoomSymptoms.style.top = top;
+    zoomSymptoms.style.opacity = 1;
+
+    zoomSymptomgrass.style.width = `${width}px`;
+    zoomSymptomgrass.style.left = left;
+    zoomSymptomgrass.style.top = top;
+    zoomSymptomgrass.style.opacity = symptomgrassOpacity;
 
 }
 
@@ -289,26 +344,23 @@ window.addEventListener("scroll", () => {
 
 }, { passive: true });
 
-let resizeTicking = false;
+let resizeTimeout;
 
 window.addEventListener("resize", () => {
 
-    if (resizeTicking) return;
+    clearTimeout(resizeTimeout);
 
-    resizeTicking = true;
-
-    requestAnimationFrame(() => {
+    resizeTimeout = setTimeout(() => {
         measureLanding();
         updateZoomScene();
-        resizeTicking = false;
-    });
+    }, 150);
 
 });
 
 // Image dimensions (and therefore the landing spot) aren't reliable
-// until both images have actually loaded, so re-measure once they
+// until the images have actually loaded, so re-measure once they
 // have in addition to the upfront measurement below.
-[zoomSymptoms, heroImage].forEach(img => {
+[zoomSymptoms, zoomSymptomgrass, heroImage].forEach(img => {
     if (img.complete) {
         measureLanding();
     } else {

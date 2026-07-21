@@ -103,65 +103,37 @@ body {
 
 
 /* ==========================
-   ZOOM TRANSITION
-   Sizing/positioning only - opacity and scale are driven
-   frame-by-frame from script.js as the user scrolls, so there
-   are no CSS transitions here (they'd fight the scroll-linked
-   values and lag behind the scrollbar).
+   ZOOM-IN INTRO
+   zoom-spacer just reserves the scroll distance the intro plays
+   across (measured in script.js). The images themselves are fixed
+   to the viewport - see .zoom-symptoms / .zoom-grass below - so
+   they can play large and centered independent of the sidebar
+   column, then shrink down onto it.
 ========================== */
 
-.zoom-scene {
+.zoom-spacer {
     height: 250vh;
-    position: relative;
-}
-
-.zoom-stage {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow: hidden
-;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .zoom-symptoms,
-.zoom-grass {
-    position: absolute;
+.zoom-symptomgrass {
+    position: fixed;
+    opacity: 0;
+    pointer-events: none;
+    /* left/top/width are set frame-by-frame from script.js as the
+       user scrolls - no CSS sizing here so the JS math (which
+       needs to know the image's true base size) stays authoritative.
+       symptomgrass.png is pre-aligned to the same canvas as
+       symptoms.png, so both are always given the identical box -
+       symptomgrass just sits on top and fades out of it. */
 }
 
 .zoom-symptoms {
-    top: 0;
-    left: 0;
-    width: 32vw;
-    max-width: 420px;
-    opacity: 0;
-    transform-origin: 47% 86.8%;
-    /* position + scale are driven frame-by-frame from script.js,
-       which anchors this by its bottom edge (not its center) so
-       zooming in reveals the bottom of the image, then animates
-       it off toward the sidebar image's landing spot. */
+    z-index: 5;
 }
 
-.zoom-grass {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
-    width: 80%;
-    height: 80%;
-
-    object-fit: contain;
-
-    transform: translate(-50%, -50%);
-    transform-origin: 55% 50%;
-
-    opacity: 0;
-
-    pointer-events: none;
+.zoom-symptomgrass {
+    z-index: 6;
 }
 
 /* ==========================
@@ -282,7 +254,7 @@ body {
 
     background: rgb(110, 144,87);
 
-    border-left: 1px solid #ddd;
+    border-left: 1px solid rgb(110, 144,87);
 
 }
 
@@ -334,6 +306,13 @@ body {
     max-width: 100%;
 
     height: auto;
+
+    /* Never actually shown - script.js's zoom-symptoms overlay
+       shrinks from center-screen and lands exactly on top of this
+       spot, then just stays there. This element exists purely to
+       reserve that spot's size/position (for measureLanding() and
+       for the markers below, which are positioned relative to it). */
+    opacity: 0;
 
 }
 
