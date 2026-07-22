@@ -5,10 +5,7 @@
 const sectionMarkers = {
     "1a": ["m-1a-1", "m-1a-2", "m-1a-3", "m-1a-4", "m-1a-5", "m-1a-6", "m-1a-7"],
     "1b": ["m-1b-1", "m-1b-2", "m-1b-3", "m-1b-4", "m-1b-5"],
-    "1c": ["m-1c-1", "m-1c-2", "m-1c-3", "m-1c-4", "m-1c-5", "m-1c-6"],
-    "2": ["m-2-1", "m-2-2"],
-    "3": ["m-3-1", "m-3-2"],
-    "4": ["m-4-1", "m-4-2"]
+    "1c": ["m-1c-1", "m-1c-2", "m-1c-3", "m-1c-4", "m-1c-5", "m-1c-6"]
 };
 
 // =====================================================
@@ -54,6 +51,9 @@ const stepOneTexts = stepOneSection.querySelectorAll(".step-text");
 const STEP_ONE_SWAP_1 = 1 / 3;
 const STEP_ONE_SWAP_2 = 2 / 3;
 
+const stepTwoSection = document.querySelector('.step[data-step="2"]');
+const tweezersImage = document.getElementById("tweezers-image");
+
 let currentStep = null;
 let currentMarkerKey = null;
 
@@ -92,6 +92,22 @@ function resolveStepOneSubstate() {
 
 }
 
+// Same idea as resolveStepOneSubstate, but returns a continuous
+// 0-1 value instead of a discrete substate - used to fade
+// tweezers.png in on top of tick.png as the user scrolls through
+// step 2 (see clamp() further down, defined via function
+// declaration so it's available here regardless of file order).
+function resolveStepTwoProgress() {
+
+    const rect = stepTwoSection.getBoundingClientRect();
+    const scrollable = rect.height - window.innerHeight;
+
+    if (scrollable <= 0) return 1;
+
+    return clamp(-rect.top / scrollable, 0, 1);
+
+}
+
 function refresh() {
 
     const activeEl = resolveActiveStep();
@@ -105,6 +121,7 @@ function refresh() {
         }
         currentStep = null;
         graphicEl.classList.remove("step2-active");
+        tweezersImage.style.opacity = 0;
         return;
     }
 
@@ -133,9 +150,15 @@ function refresh() {
         showMarkers(markerKey);
     }
 
-    // Step 2 swaps symptoms.png out for tick.png/skin.png - see
-    // .graphic.step2-active in style.css.
+    // Step 2 swaps symptoms.png out for the skin.png/tick.png stack
+    // - see .graphic.step2-active in style.css. tweezers.png then
+    // fades in on top of tick.png as the user scrolls through the
+    // step, tracking scroll position directly (like the zoom-in
+    // intro) rather than a fixed transition, so it can move back
+    // and forth with the scrollbar.
     graphicEl.classList.toggle("step2-active", currentStep === "2");
+
+    tweezersImage.style.opacity = currentStep === "2" ? resolveStepTwoProgress() : 0;
 
 }
 

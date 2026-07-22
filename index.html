@@ -231,25 +231,16 @@
         <div class="marker" id="m-1c-5"></div>
         <div class="marker" id="m-1c-6"></div>
 
-        <!-- Step 2 -->
-        <div class="marker" id="m-2-1"></div>
-        <div class="marker" id="m-2-2"></div>
-
-        <!-- Step 3 -->
-        <div class="marker" id="m-3-1"></div>
-        <div class="marker" id="m-3-2"></div>
-
-        <!-- Step 4 -->
-        <div class="marker" id="m-4-1"></div>
-        <div class="marker" id="m-4-2"></div>
-
     </div>
 
-    <!-- Step 2 images: fade in over symptoms.png (which fades out)
-         while step 2 is active - see .step2-image in style.css and
-         the step2-active toggle in script.js's refresh(). -->
-    <img src="images/tick.png" class="step2-image" id="tick-image" alt="">
+    <!-- Step 2 images: skin.png fades in first (bottom layer), tick.png
+         is overlaid directly on top of it, and tweezers.png fades in on
+         top of tick.png as the user scrolls through step 2 - see
+         .step2-image in style.css and the step2-active toggle /
+         resolveStepTwoProgress() in script.js's refresh(). -->
     <img src="images/skin.png" class="step2-image" id="skin-image" alt="">
+    <img src="images/tick.png" class="step2-image" id="tick-image" alt="">
+    <img src="images/tweezers.png" class="step2-image" id="tweezers-image" alt="">
 
 </div>
 

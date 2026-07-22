@@ -338,13 +338,18 @@ body {
 
 .step2-image {
 
+    /* All three images share this exact box, so tick.png sits
+       directly on top of skin.png, and tweezers.png on top of
+       both - see z-index order below. */
     position: absolute;
 
     top: 8%;
 
-    width: 20%;
+    left: 50%;
 
-    max-width: 240px;
+    width: 26%;
+
+    max-width: 300px;
 
     height: auto;
 
@@ -352,25 +357,33 @@ body {
 
     pointer-events: none;
 
-    z-index: 15;
+    transform: translateX(-50%);
 
-    transition: opacity 0.8s ease;
-
-}
-
-#tick-image {
-    left: 14%;
 }
 
 #skin-image {
-    left: 56%;
+    z-index: 15;
+    transition: opacity 0.8s ease;
+}
+
+#tick-image {
+    z-index: 16;
+    transition: opacity 0.8s ease;
+}
+
+#tweezers-image {
+    /* No CSS transition here - its opacity is driven frame-by-frame
+       from scroll position in script.js's resolveStepTwoProgress(),
+       same pattern as the zoom-in overlays. */
+    z-index: 17;
 }
 
 .graphic.step2-active .image-wrapper {
     opacity: 0;
 }
 
-.graphic.step2-active .step2-image {
+.graphic.step2-active #skin-image,
+.graphic.step2-active #tick-image {
     opacity: 1;
 }
 
@@ -458,18 +471,6 @@ body {
 #m-1c-4 { top: 81%; left: 60%; }
 #m-1c-5 { top: 83%; left: 60%; }
 #m-1c-6 { top: 85%; left: 60%; }
-
-/* Step 2 */
-#m-2-1 { top: 40%; left: 25%; }
-#m-2-2 { top: 48%; left: 72%; }
-
-/* Step 3 */
-#m-3-1 { top: 58%; left: 38%; }
-#m-3-2 { top: 62%; left: 60%; }
-
-/* Step 4 */
-#m-4-1 { top: 75%; left: 32%; }
-#m-4-2 { top: 80%; left: 68%; }
 
 /* ==========================
    ACTIVE STEP HIGHLIGHT
