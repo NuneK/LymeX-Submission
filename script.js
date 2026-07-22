@@ -52,7 +52,10 @@ const STEP_ONE_SWAP_1 = 1 / 3;
 const STEP_ONE_SWAP_2 = 2 / 3;
 
 const stepTwoSection = document.querySelector('.step[data-step="2"]');
+
+const tickImage = document.getElementById("tick-image");
 const tweezersImage = document.getElementById("tweezers-image");
+const tickTweezerImage = document.getElementById("ticktweezer-image");
 
 let currentStep = null;
 let currentMarkerKey = null;
@@ -158,7 +161,54 @@ function refresh() {
     // and forth with the scrollbar.
     graphicEl.classList.toggle("step2-active", currentStep === "2");
 
-    tweezersImage.style.opacity = currentStep === "2" ? resolveStepTwoProgress() : 0;
+    if (currentStep === "2") {
+
+    const progress = resolveStepTwoProgress();
+
+    const swapPoint = 0.60;
+
+    if (progress < swapPoint) {
+
+        // First phase:
+        // skin + tick visible
+        // tweezers fade in
+
+        tickImage.style.opacity = 1;
+        tweezersImage.style.opacity = progress / swapPoint;
+        tickTweezerImage.style.opacity = 0;
+        tickTweezerImage.style.transform =
+            "translateX(-50%) translateY(0px)";
+
+    } else {
+
+        // Second phase:
+        // instantly replace the two separate images with the combined image
+
+        tickImage.style.opacity = 0;
+        tweezersImage.style.opacity = 0;
+        tickTweezerImage.style.opacity = 1;
+
+        // Remaining 40% of Step 2 controls the upward motion
+
+        const liftProgress = (progress - swapPoint) / (1 - swapPoint);
+
+        const maxLift = 80;
+
+        tickTweezerImage.style.transform =
+            `translateX(-50%) translateY(${-liftProgress * maxLift}px)`;
+
+    }
+
+} else {
+
+    tickImage.style.opacity = 0;
+    tweezersImage.style.opacity = 0;
+    tickTweezerImage.style.opacity = 0;
+
+    tickTweezerImage.style.transform =
+        "translateX(-50%) translateY(0px)";
+
+}
 
 }
 

@@ -139,7 +139,7 @@ body {
 
 .scroller {
 
-    width: 40%;
+    width: 60%;
 
     padding: 0 60px;
 
@@ -204,8 +204,6 @@ body {
 }
 
 .step.active {
-
-    border-left: 4px solid #333;
 
     padding-left: 20px;
 
@@ -368,7 +366,7 @@ body {
 
 #tick-image {
     z-index: 16;
-    transition: opacity 0.8s ease;
+    transition: opacity 0.01s ease;
 }
 
 #tweezers-image {
@@ -376,6 +374,11 @@ body {
        from scroll position in script.js's resolveStepTwoProgress(),
        same pattern as the zoom-in overlays. */
     z-index: 17;
+}
+
+#ticktweezer-image {
+    z-index: 18;
+    opacity: 0;
 }
 
 .graphic.step2-active .image-wrapper {
@@ -523,7 +526,7 @@ body {
 
         width: 100%;
 
-        padding: 30px;
+        padding: 10px;
 
     }
 
