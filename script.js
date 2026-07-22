@@ -144,7 +144,8 @@ function refresh() {
 // sidebar's reserved spot (where the invisible hero-image sits,
 // used only to define that spot's size/position) and then just
 // stay there - symptoms.png is the only image that's ever actually
-// visible on the right side of the screen.
+// visible on the right side of the screen. A caption is layered
+// into this same held-in-place window - see zoom-caption below.
 //
 // Because the two images are pre-aligned to the same canvas, they
 // always share one box - same left/top/width every frame. That
@@ -152,18 +153,22 @@ function refresh() {
 // makes it read as "the grass fading in, then away" rather than
 // two images sliding around independently:
 //
-//   0.00 - 0.25  shared box holds at center-screen, zoomed in.
+//   0.00 - 0.20  shared box holds at center-screen, zoomed in.
 //                symptomgrass.png (on top) fades from fully
 //                transparent to fully opaque, over symptoms.png
 //                (underneath, always fully opaque once this phase
-//                starts).
-//   0.25 - 0.5   still held in place; symptomgrass.png now fades
-//                from opaque back to transparent, revealing the
-//                person already standing there underneath.
-//   0.5  - 1.0   symptomgrass.png is fully gone. Only now does
-//                symptoms.png shrink and travel from center-screen
-//                onto the sidebar's reserved spot, landing exactly
-//                on it and staying there.
+//                starts). Caption still hidden.
+//   0.20 - 0.35  symptomgrass.png now holds fully opaque and static
+//                while zoom-caption fades in below the image.
+//   0.35 - 0.45  both symptomgrass.png and the caption hold fully
+//                visible - a beat to actually read the caption.
+//   0.45 - 0.60  symptomgrass.png and the caption fade back out
+//                together, revealing the person already standing
+//                there underneath.
+//   0.60 - 1.0   symptomgrass.png and the caption are fully gone.
+//                Only now does symptoms.png shrink and travel from
+//                center-screen onto the sidebar's reserved spot,
+//                landing exactly on it and staying there.
 //
 // Before the spacer has actually been scrolled to, both overlays
 // are kept fully hidden rather than sitting at their progress=0
@@ -175,16 +180,24 @@ function refresh() {
 const zoomSpacer = document.querySelector(".zoom-spacer");
 const zoomSymptoms = document.querySelector(".zoom-symptoms");
 const zoomSymptomgrass = document.querySelector(".zoom-symptomgrass");
+const zoomCaption = document.querySelector(".zoom-caption");
 const graphicEl = document.querySelector(".graphic");
 const heroImage = document.querySelector(".hero-image");
 
 const ZOOM_SCALE = 5;   // how "zoomed in" symptoms.png looks at its biggest
 
-// symptomgrass.png's opacity arc within the first half of the
-// zoom sequence: invisible -> fades in to full opacity -> fades
-// back out. Expressed as fractions of total scroll progress (0-1).
-const GRASS_FADE_IN_END = 0.25;
-const GRASS_FADE_OUT_END = 0.5;
+// How much space below the image's bottom edge the caption sits,
+// in CSS pixels.
+const CAPTION_GAP = 24;
+
+// The held-in-place window's internal timeline: symptomgrass.png
+// fades in, holds while the caption fades in under it, both hold
+// for a beat, then both fade out together. Expressed as fractions
+// of total scroll progress (0-1) - see the phase breakdown above.
+const GRASS_FADE_IN_END = 0.2;
+const CAPTION_FADE_IN_END = 0.35;
+const HOLD_END = 0.45;
+const FADE_OUT_END = 0.6;
 
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
@@ -261,6 +274,7 @@ function updateZoomScene() {
     if (rect.top > 0) {
         zoomSymptoms.style.opacity = 0;
         zoomSymptomgrass.style.opacity = 0;
+        zoomCaption.style.opacity = 0;
         heroImage.style.opacity = 0;
         return;
     }
@@ -280,6 +294,7 @@ function updateZoomScene() {
     if (progress >= 1) {
         zoomSymptoms.style.opacity = 0;
         zoomSymptomgrass.style.opacity = 0;
+        zoomCaption.style.opacity = 0;
         heroImage.style.opacity = 1;
         return;
     }
@@ -293,34 +308,45 @@ function updateZoomScene() {
     const groundY = window.innerHeight / 2;
 
     let symptomgrassOpacity;
+    let captionOpacity;
     let x, bottomY, scale;
 
-    if (progress <= GRASS_FADE_OUT_END) {
+    if (progress <= FADE_OUT_END) {
 
-        // Held at center-screen, zoomed in, while symptomgrass.png
-        // plays its opacity arc on top of symptoms.png (underneath,
-        // always fully opaque): fades in from nothing, then - once
-        // fully visible - fades back out to reveal the person
-        // already standing there.
+        // Held at center-screen, zoomed in, for the whole
+        // grass-and-caption sequence: symptomgrass.png fades in,
+        // holds static while the caption fades in under it, both
+        // hold for a beat, then both fade out together to reveal
+        // the person already standing there.
         x = centerX;
         bottomY = groundY;
         scale = ZOOM_SCALE;
 
         if (progress <= GRASS_FADE_IN_END) {
             symptomgrassOpacity = progress / GRASS_FADE_IN_END;
+            captionOpacity = 0;
+        } else if (progress <= CAPTION_FADE_IN_END) {
+            symptomgrassOpacity = 1;
+            captionOpacity = (progress - GRASS_FADE_IN_END) / (CAPTION_FADE_IN_END - GRASS_FADE_IN_END);
+        } else if (progress <= HOLD_END) {
+            symptomgrassOpacity = 1;
+            captionOpacity = 1;
         } else {
-            const p = (progress - GRASS_FADE_IN_END) / (GRASS_FADE_OUT_END - GRASS_FADE_IN_END);
+            const p = (progress - HOLD_END) / (FADE_OUT_END - HOLD_END);
             symptomgrassOpacity = 1 - p;
+            captionOpacity = 1 - p;
         }
 
     } else {
 
-        // symptomgrass.png is fully gone - now symptoms.png alone
-        // shrinks and travels onto its landing spot in the sidebar,
-        // where it stays once it arrives (progress clamps at 1).
-        const p = (progress - GRASS_FADE_OUT_END) / (1 - GRASS_FADE_OUT_END);
+        // symptomgrass.png and the caption are fully gone - now
+        // symptoms.png alone shrinks and travels onto its landing
+        // spot in the sidebar, where it stays once it arrives
+        // (progress clamps at 1).
+        const p = (progress - FADE_OUT_END) / (1 - FADE_OUT_END);
 
         symptomgrassOpacity = 0;
+        captionOpacity = 0;
 
         x = lerp(centerX, landing.x, p);
         bottomY = lerp(groundY, landing.bottomY, p);
@@ -342,6 +368,15 @@ function updateZoomScene() {
     zoomSymptomgrass.style.left = left;
     zoomSymptomgrass.style.top = top;
     zoomSymptomgrass.style.opacity = symptomgrassOpacity;
+
+    // Caption sits centered under the shared image box's bottom
+    // edge. Bottom edge stays anchored at groundY throughout the
+    // held phase (only symptoms.png/symptomgrass.png's top moves
+    // to accommodate scale), so the caption doesn't jump around
+    // while it fades in/out.
+    zoomCaption.style.left = `${x}px`;
+    zoomCaption.style.top = `${bottomY + CAPTION_GAP}px`;
+    zoomCaption.style.opacity = captionOpacity;
 
 }
 

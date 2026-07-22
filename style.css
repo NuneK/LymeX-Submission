@@ -8,9 +8,9 @@
 
 body {
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Comic Sans MS', "Comic Sans", cursive;
     color: #333;
-    background: rgb(92, 144, 87);
+    background: rgb(232, 216, 191);
 }
 
 .sticky-text {
@@ -103,6 +103,27 @@ body {
     z-index: 6;
 }
 
+.zoom-caption {
+    position: fixed;
+    opacity: 0;
+    pointer-events: none;
+    /* left/top are set frame-by-frame from script.js, same as the
+       two images - centered under the image's bottom edge. */
+    transform: translateX(-50%);
+    text-align: center;
+    max-width: 480px;
+    padding: 0 20px;
+    z-index: 6;
+}
+
+.zoom-caption p {
+    margin: 0;
+    font-size: 1.4rem;
+    line-height: 1.6;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
 /* ==========================
    PAGE LAYOUT
 ========================== */
@@ -153,8 +174,16 @@ body {
     position: relative;
     width: 100%;
     /* Reserve space so the wrap doesn't collapse to 0 height
-       (both children are absolutely positioned) */
-    min-height: 140px;
+       (both children are absolutely positioned). Bumped up from
+       140px: with the "Following a tick bite..." list now properly
+       absolutely-positioned (instead of accidentally escaping its
+       <p> and adding real flow height), .step-text-wrap lost the
+       extra height that used to push the whole h2+wrap block
+       higher up the screen inside .sticky-step-text's centered
+       flexbox. This restores that same vertical footprint on
+       purpose. Tune this number directly to taste - it's the one
+       knob controlling how high the block sits. */
+    min-height: 320px;
 }
 
 .step-text {
@@ -176,7 +205,7 @@ body {
 
 .step.active {
 
-    border-left: 4px solid steelblue;
+    border-left: 4px solid #333;
 
     padding-left: 20px;
 
@@ -190,11 +219,18 @@ body {
 
 }
 
-.step p {
+.step p,
+.step ul {
 
     font-size: 1.15rem;
 
     line-height: 1.7;
+
+}
+
+.step ul ul {
+
+    font-size: 1rem;
 
 }
 
@@ -239,9 +275,9 @@ body {
 
     align-items: center;
 
-    background: rgb(110, 144,87);
+    background: rgb(232, 216, 191);
 
-    border-left: 1px solid rgb(110, 144,87);
+    border-left: 1px solid rgb(232, 216, 191);
 
 }
 
@@ -256,9 +292,9 @@ body {
 
     height: 80%;
 
-    background: rgb(110, 144,87);
+    background: rgb(232, 216, 191);
 
-    border: 1px solid rgb(110, 144,87);
+    border: 1px solid rgb(232, 216, 191);
 
     border-radius: 14px;
 
@@ -322,7 +358,7 @@ body {
 
     border-radius: 50%;
 
-    background: #e63946;
+    background: #ff2d3e;
 
     box-shadow: 0 0 0 5px rgba(230, 57, 70, 0.25);
 
@@ -350,13 +386,13 @@ body {
    points of interest on symptoms.png */
 
 /* "Especially during summer and fall..." - 7 markers */
-#m-1a-1 { top: 52%; left: 32%; }
-#m-1a-2 { top: 53%; left: 32%; }
-#m-1a-3 { top: 54%; left: 32%; }
-#m-1a-4 { top: 55%; left: 32%; }
-#m-1a-5 { top: 56%; left: 32%; }
-#m-1a-6 { top: 57%; left: 32%; }
-#m-1a-7 { top: 58%; left: 32%; }
+#m-1a-1 { top: 31%; left: 34%; }
+#m-1a-2 { top: 11%; left: 39%; }
+#m-1a-3 { top: 4%; left: 50%; }
+#m-1a-4 { top: 40%; left: 50%; }
+#m-1a-5 { top: 48%; left: 25%; }
+#m-1a-6 { top: 57%; left: 50%; }
+#m-1a-7 { top: 92%; left: 46%; }
 
 /* "If you find a tick, remove it..." - 5 markers */
 #m-1b-1 { top: 58%; left: 35%; }
@@ -391,7 +427,7 @@ body {
 
 .step.active h2 {
 
-    color: steelblue;
+    color: #333;
 
 }
 
