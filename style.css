@@ -10,7 +10,7 @@ body {
     margin: 0;
     font-family: 'Comic Sans MS', "Comic Sans", cursive;
     color: #333;
-    background: rgb(232, 216, 191);
+    background: rgb(243, 209, 174);
 }
 
 .sticky-text {
@@ -275,9 +275,9 @@ body {
 
     align-items: center;
 
-    background: rgb(232, 216, 191);
+    background: rgb(243, 209, 174);
 
-    border-left: 1px solid rgb(232, 216, 191);
+    border-left: 1px solid rgb(243, 209, 174);
 
 }
 
@@ -292,9 +292,9 @@ body {
 
     height: 80%;
 
-    background: rgb(232, 216, 191);
+    background: rgb(243, 209, 174);
 
-    border: 1px solid rgb(232, 216, 191);
+    border: 1px solid rgb(243, 209, 174);
 
     border-radius: 14px;
 
@@ -322,6 +322,56 @@ body {
 
     z-index: 10;
 
+    /* Lets step 2 fade symptoms.png (and its markers, which live
+       inside this wrapper) out as a unit - see .graphic.step2-active
+       below and the step2-active toggle in script.js's refresh(). */
+    transition: opacity 0.8s ease;
+
+}
+
+/* ==========================
+   STEP 2 IMAGES (tick.png / skin.png)
+   Fade in over the upper third of the right column while symptoms.png
+   fades out. Placeholder positions/sizes - tune left/top/width to
+   taste once the images are in the images folder.
+========================== */
+
+.step2-image {
+
+    position: absolute;
+
+    top: 8%;
+
+    width: 20%;
+
+    max-width: 240px;
+
+    height: auto;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    z-index: 15;
+
+    transition: opacity 0.8s ease;
+
+}
+
+#tick-image {
+    left: 14%;
+}
+
+#skin-image {
+    left: 56%;
+}
+
+.graphic.step2-active .image-wrapper {
+    opacity: 0;
+}
+
+.graphic.step2-active .step2-image {
+    opacity: 1;
 }
 
 .hero-image {
@@ -431,6 +481,30 @@ body {
 
 }
 
+
+/* ==========================
+   MAP SECTION
+========================== */
+
+.map-section {
+
+    width: 100%;
+
+    height: 100vh;
+
+}
+
+.map-image {
+
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+}
 
 /* ==========================
    RESPONSIVE

@@ -104,6 +104,7 @@ function refresh() {
             showMarkers(null);
         }
         currentStep = null;
+        graphicEl.classList.remove("step2-active");
         return;
     }
 
@@ -131,6 +132,10 @@ function refresh() {
         currentMarkerKey = markerKey;
         showMarkers(markerKey);
     }
+
+    // Step 2 swaps symptoms.png out for tick.png/skin.png - see
+    // .graphic.step2-active in style.css.
+    graphicEl.classList.toggle("step2-active", currentStep === "2");
 
 }
 
