@@ -597,6 +597,25 @@ const regionFiles = {
     noncontinent: "noncontinental.png"
 };
 
+// Placeholder copy for each region - swap these for the real text
+// whenever it's ready. Whatever key isn't hovered (including when
+// the cursor isn't over any region at all) falls back to
+// DEFAULT_MAP_TEXT, captured below from the paragraph's original
+// markup.
+const regionText = {
+    newengland: "This region has the highest incidence of Lyme disease in the United States and accounts for over 60% of all nationwide cases. Blacklegged ticks are common, particularly in wooded and grassy areas. If you experienced a tick bite or developed symptoms after spending time outdoors, discuss Lyme disease with your healthcare provider.",
+    midatlantic: "Lyme disease is also very common in this region, especially in Pennsylvania, New York, New Jersey, Maryland, Delaware, and Virginia. Risk is highest during late spring through early fall but exposure can occur year round. West Virginia has seen one of the highest surge rates (+236% increase in reported incidence).",
+    southeast: "This region has a lower incidence of Lyme disease compared to other parts of the country. However, ticks are still present in wooded and grassy areas. If you experienced a tick bite or developed symptoms after spending time outdoors, discuss Lyme disease with your healthcare provider.",
+    midwest: "Wisconsin and Minnesota report high numbers of Lyme disease cases each year. Ticks carrying Lyme disease are well established throughout much of this region.",
+    southwest: "Lyme disease is uncommon across most hot, dry desert environments because these conditions are generally less favorable for the ticks that transmit it.",
+    mountain: "Lyme disease is relatively uncommon overall, though localized areas of risk exist. Tick exposure can still occur, particularly during outdoor recreation.",
+    pnw: "Lyme disease occurs primarily in northern coastal and foothill regions and accounts for under 1%-2% of total national cases. Overall risk is lower than in the Northeast, but exposure is possible after spending time in wooded or grassy habitats.",
+    noncontinent: "Lyme disease is not considered established in Hawaii and Alaska. If you recently traveled to another region, your exposure risk may depend more on where you visited."
+};
+
+const mapTextElement = document.getElementById("map-text-content");
+const DEFAULT_MAP_TEXT = mapTextElement ? mapTextElement.textContent : "";
+
 const regionRasters = {}; // key -> { data, width, height }
 
 function loadRegionRaster(key, filename) {
@@ -607,21 +626,43 @@ function loadRegionRaster(key, filename) {
 
         img.onload = () => {
 
-            const width = usMapImage.naturalWidth || img.naturalWidth;
-            const height = usMapImage.naturalHeight || img.naturalHeight;
+            try {
 
-            const canvas = document.createElement("canvas");
-            canvas.width = width;
-            canvas.height = height;
+                const width = usMapImage.naturalWidth || img.naturalWidth;
+                const height = usMapImage.naturalHeight || img.naturalHeight;
 
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, width, height);
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
 
-            regionRasters[key] = {
-                data: ctx.getImageData(0, 0, width, height).data,
-                width,
-                height
-            };
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, width, height);
+
+                regionRasters[key] = {
+                    data: ctx.getImageData(0, 0, width, height).data,
+                    width,
+                    height
+                };
+
+            } catch (err) {
+
+                // Most likely cause: the page is being opened as a
+                // file:// URL instead of served over http(s). Browsers
+                // treat locally-loaded images as tainting the canvas,
+                // which blocks getImageData with a SecurityError - so
+                // without this catch, this promise would never resolve
+                // and map hover would silently never turn on at all.
+                console.error(
+                    `Map hover: couldn't read pixels from images/${filename}. ` +
+                    `If you're opening this file directly (file://) rather ` +
+                    `than through a local server, that's almost certainly ` +
+                    `why - canvas pixel reads are blocked for local files. ` +
+                    `Try running a local server (e.g. "npx serve ." or ` +
+                    `VS Code's Live Server) instead.`,
+                    err
+                );
+
+            }
 
             resolve();
 
@@ -629,7 +670,10 @@ function loadRegionRaster(key, filename) {
 
         // Resolve even on a failed load so one bad file doesn't
         // block hover detection for every other region.
-        img.onerror = () => resolve();
+        img.onerror = () => {
+            console.error(`Map hover: failed to load images/${filename}`);
+            resolve();
+        };
 
         img.src = `images/${filename}`;
 
@@ -655,7 +699,7 @@ function isPointInsideRegion(key, x, y) {
 
 }
 
-function showRegionOverlay(activeKey) {
+function setActiveRegion(activeKey) {
 
     Object.keys(regionFiles).forEach(key => {
 
@@ -665,6 +709,11 @@ function showRegionOverlay(activeKey) {
         overlay.classList.toggle("visible", key === activeKey);
 
     });
+
+    if (mapTextElement) {
+        mapTextElement.textContent =
+            (activeKey && regionText[activeKey]) || DEFAULT_MAP_TEXT;
+    }
 
 }
 
@@ -719,7 +768,7 @@ function setUpMapHover() {
                     localX < 0 || localY < 0 ||
                     localX > renderedWidth || localY > renderedHeight
                 ) {
-                    showRegionOverlay(null);
+                    setActiveRegion(null);
                     return;
                 }
 
@@ -730,12 +779,12 @@ function setUpMapHover() {
                     key => isPointInsideRegion(key, naturalX, naturalY)
                 );
 
-                showRegionOverlay(hoveredKey || null);
+                setActiveRegion(hoveredKey || null);
 
             });
 
             mapImageWrapper.addEventListener("mouseleave", () => {
-                showRegionOverlay(null);
+                setActiveRegion(null);
             });
 
         });
