@@ -159,41 +159,6 @@
      </div>
         </section>
 
-
-        <section class="step" data-step="3">
-<div class="sticky-step-text">
-            <h2>Symptoms Timeline</h2>
-
-            <p>
-                Scroll over the visualization on the right.
-            </p>
-
-            <p>
-                While your mouse is over the visualization,
-                your mouse wheel controls the timeline instead
-                of scrolling the page.
-            </p>
-
-            <p>
-                Move your mouse back over this text to continue
-                scrolling to Step 4.
-            </p>
-
-</div>
-        </section>
-
-
-        <section class="step" data-step="4">
-<div class="sticky-step-text">
-            <h2>Step 4</h2>
-
-            <p>
-                Final visualization.
-            </p>
-
-</div>
-        </section>
-
     </div>
 
 
@@ -243,18 +208,62 @@
     <img src="images/tweezers.png" class="step2-image" id="tweezers-image" alt="">
     <img src="images/ticktweezer.png" class="step2-image" id="ticktweezer-image" alt="">
 
+    <!-- Fades in once ticktweezer.png has finished lifting all the
+         way up - see the liftEnd threshold and the step 2 block in
+         script.js's refresh(). Sits in the middle third of the
+         right column - see #baggie-image in style.css. -->
+    <!-- Small tick.png that travels down into baggie.png's center
+         and ends up tucked behind it - see #baggie-tick-image in
+         style.css and the same step 2 block in script.js. -->
+    <img src="images/tick.png" class="step2-image" id="baggie-tick-image" alt="">
+    <img src="images/baggie.png" class="step2-image" id="baggie-image" alt="">
+
+    <!-- Fades in once the mini tick has finished traveling into
+         baggie.png - see the baggieEnd threshold and the step 2
+         block in script.js's refresh(). Sits in the lower third of
+         the right column - see #doctor-image in style.css. -->
+    <img src="images/doctor.png" class="step2-image" id="doctor-image" alt="">
+
 </div>
 
 </div>
 
 <!-- ==========================
      MAP SECTION
-     Full-viewport image, outside the two-column .container so it
-     spans the full page width. Comes right after step 4.
+     Outside the two-column .container so it spans the full page
+     width. Comes right after step 2. Narrow text column on the
+     left, USmap.png filling the rest of the section - see
+     .map-section / .map-text / .map-image in style.css.
+
+     The 8 region-outline images are absolutely stacked on top of
+     USmap.png at identical size/position (see .map-image-wrapper
+     and .region-overlay in style.css) and start hidden. script.js's
+     map-hover block rasterizes each one to figure out which region
+     the cursor is over (there's no vector shape to hit-test against
+     - just these outline PNGs) and reveals the matching overlay.
 =========================== -->
 
 <section class="map-section">
-    <img src="images/map.jpg" alt="" class="map-image">
+
+    <div class="map-text">
+        <p>Move your cursor over the area of interest</p>
+    </div>
+
+    <div class="map-image-wrapper">
+
+        <img src="images/USmap.png" alt="" class="map-image" id="us-map-image">
+
+        <img src="images/newengland.png" alt="" class="region-overlay" id="region-newengland">
+        <img src="images/midatlantic.png" alt="" class="region-overlay" id="region-midatlantic">
+        <img src="images/southeast.png" alt="" class="region-overlay" id="region-southeast">
+        <img src="images/midwest.png" alt="" class="region-overlay" id="region-midwest">
+        <img src="images/southwest.png" alt="" class="region-overlay" id="region-southwest">
+        <img src="images/mountain.png" alt="" class="region-overlay" id="region-mountain">
+        <img src="images/PNW.png" alt="" class="region-overlay" id="region-pnw">
+        <img src="images/noncontinental.png" alt="" class="region-overlay" id="region-noncontinent">
+
+    </div>
+
 </section>
 
 <!-- ==========================

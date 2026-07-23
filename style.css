@@ -139,6 +139,9 @@ body {
 
 .scroller {
 
+/* change this to make the text in the left column wider 
+or thinner, does wonders for filling up the blank space*/
+
     width: 60%;
 
     padding: 0 60px;
@@ -156,6 +159,14 @@ body {
    other mid-scroll, so it gets extra scroll runway: room for
    the pause, the fade, and a beat to read each chunk of text. */
 .step[data-step="1"] {
+    min-height: 260vh;
+}
+
+/* Step 2 now has a fourth phase after baggie.png/the mini tick
+   (doctor.png fading in - see #doctor-image below and the step 2
+   block in script.js's refresh()), so it gets extra scroll runway
+   again. */
+.step[data-step="2"] {
     min-height: 260vh;
 }
 
@@ -343,9 +354,9 @@ body {
 
     top: 8%;
 
-    left: 50%;
+    left: 40%;
 
-    width: 26%;
+    width: 40%;
 
     max-width: 300px;
 
@@ -378,6 +389,50 @@ body {
 
 #ticktweezer-image {
     z-index: 18;
+    opacity: 0;
+}
+
+/* Sits in the middle third of the right column (roughly the 33%-66%
+   band), rather than the upper-third box the skin/tick/tweezers
+   stack uses - overrides the top/left/width that .step2-image sets
+   by default. Opacity is driven frame-by-frame from scroll position
+   in script.js's refresh(), same pattern as #tweezers-image. */
+#baggie-image {
+    top: 38%;
+    left: 45%;
+    width: 55%;
+    z-index: 19;
+    opacity: 0;
+}
+
+/* Small copy of tick.png that starts above baggie.png and travels
+   down to baggie's center as the user scrolls through phase 3 - see
+   the step 2 block in script.js's refresh(). Its resting top/left
+   match baggie.png's own center point; the upward offset is applied
+   as a translateY on top of that, driven frame-by-frame from
+   script.js, so tuning baggie's position above also moves this
+   image's landing spot with it. Sits one z-index behind baggie.png
+   (18 vs 19) so it ends up tucked behind it once it arrives. */
+#baggie-tick-image {
+    top: 45%;
+    left: 45%;
+    width: 8%;
+    z-index: 18;
+    opacity: 0;
+}
+
+/* Sits in the lower third of the right column (roughly the 66%-100%
+   band) - overrides the top/left/width that .step2-image sets by
+   default, same pattern as #baggie-image above. Opacity is driven
+   frame-by-frame from scroll position in script.js's refresh(),
+   once the mini tick has finished traveling into baggie.png. Sits
+   above both baggie.png and the mini tick (z-index 20 vs 19/18). */
+#doctor-image {
+    top: 62%;
+    left: 45%;
+    width: 100%;
+    max-width: none;
+    z-index: 20;
     opacity: 0;
 }
 
@@ -496,17 +551,79 @@ body {
 
     height: 100vh;
 
+    display: flex;
+
+    align-items: center;
+
 }
 
-.map-image {
+.map-text {
+
+    width: 20%;
+
+    padding: 0 40px;
+
+    text-align: center;
+
+}
+
+.map-text p {
+
+    font-size: 1.3rem;
+
+    line-height: 1.7;
+
+}
+
+.map-image-wrapper {
+
+    position: relative;
+
+    width: 80%;
+
+    height: 100%;
+
+}
+
+.map-image,
+.region-overlay {
 
     display: block;
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
 
     width: 100%;
 
     height: 100%;
 
-    object-fit: cover;
+    /* USmap.png is a shaped graphic (not a full-bleed photo like
+       map.jpg was), so contain keeps the whole map visible instead
+       of cropping its edges the way cover would. The region
+       overlays share this exact box so they line up with USmap.png
+       pixel-for-pixel - see script.js's map-hover block for how the
+       cursor position is converted into this same coordinate
+       space. */
+    object-fit: contain;
+
+}
+
+.region-overlay {
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity 0.15s ease;
+
+}
+
+.region-overlay.visible {
+
+    opacity: 1;
 
 }
 
@@ -541,6 +658,32 @@ body {
         border-left: none;
 
         border-top: 1px solid #ddd;
+
+    }
+
+    .map-section {
+
+        flex-direction: column;
+
+        height: auto;
+
+        padding: 40px 0;
+
+    }
+
+    .map-text {
+
+        width: 100%;
+
+        padding: 0 20px 20px;
+
+    }
+
+    .map-image-wrapper {
+
+        width: 90%;
+
+        height: 60vh;
 
     }
 
