@@ -38,7 +38,7 @@
 
 <!-- ==========================
      MAIN SCROLL STORY
-     The zoom-in intro (symptoms.png + grass.png) plays as overlays
+     The zoom-in intro (symptoms.png + wtick.png) plays as overlays
      fixed to the viewport, then shrinks down onto the sidebar's
      reserved spot. The instant it fully lands, script.js hides
      those fixed overlays and reveals hero-image in their place -
@@ -269,54 +269,130 @@
 <!-- ==========================
      QUIZ SECTION
      Placeholder questions/answers - swap in the real copy whenever
-     it's ready. Each answer is its own toggle button rather than a
-     radio group (see .quiz-answer.selected in style.css and the
-     click handler in script.js's QUIZ ANSWER SELECTION block),
-     since users can select any number of answers per question.
+     it's ready. .quiz-intro is its own full-screen section (title +
+     blurb + start button) preceding .quiz-section, so question 1
+     stays off-screen until the user either scrolls past the intro
+     or clicks "Start Quiz" - see the "Start Quiz" / "Next" handlers
+     in script.js's QUIZ section. Each full-screen question keeps
+     its text + checkboxes to the left (.quiz-question-content) and
+     leaves the right side of the screen open (.quiz-question-space)
+     - see style.css. Checkboxes are plain inputs rather than toggle
+     buttons, so no answer JS is needed - the browser handles the
+     checked state itself, and any number can be checked per
+     question. Question 3's "See Results" button leads into the
+     .quiz-results section just below, which compiles every checked
+     answer into a list - see script.js's QUIZ section.
 =========================== -->
+
+<section class="quiz-intro">
+
+    <h2 class="quiz-title">Symptoms Compiler</h2>
+
+    <p class="quiz-intro-text">This quiz is for compiling your symptoms.</p>
+
+    <button class="quiz-start" type="button" data-next-question="1">Start Quiz</button>
+
+</section>
 
 <section class="quiz-section">
 
-    <h2 class="quiz-title">Test Your Knowledge</h2>
-
     <div class="quiz-question" data-question="1">
 
-        <p class="quiz-question-text">Placeholder question one?</p>
+        <div class="quiz-question-content">
 
-        <div class="quiz-answers">
-            <button class="quiz-answer" type="button">Option 1</button>
-            <button class="quiz-answer" type="button">Option 2</button>
-            <button class="quiz-answer" type="button">Option 3</button>
-            <button class="quiz-answer" type="button">Option 4</button>
+            <p class="quiz-question-text">Placeholder question one?</p>
+
+            <div class="quiz-answers">
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>Option 1</span></label>
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>Option 2</span></label>
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>Option 3</span></label>
+            </div>
+
+            <button class="quiz-next" type="button" data-next-question="2">Next</button>
+
         </div>
+
+        <div class="quiz-question-space"></div>
 
     </div>
 
     <div class="quiz-question" data-question="2">
 
-        <p class="quiz-question-text">Placeholder question two?</p>
+        <div class="quiz-question-content">
 
-        <div class="quiz-answers">
-            <button class="quiz-answer" type="button">Option 1</button>
-            <button class="quiz-answer" type="button">Option 2</button>
-            <button class="quiz-answer" type="button">Option 3</button>
-            <button class="quiz-answer" type="button">Option 4</button>
+            <p class="quiz-question-text">Placeholder question two?</p>
+
+            <div class="quiz-answers">
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>Option 1</span></label>
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>Option 2</span></label>
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>Option 3</span></label>
+            </div>
+
+            <button class="quiz-next" type="button" data-next-question="3">Next</button>
+
         </div>
+
+        <div class="quiz-question-space"></div>
 
     </div>
 
     <div class="quiz-question" data-question="3">
 
-        <p class="quiz-question-text">Placeholder question three?</p>
+        <div class="quiz-question-content">
 
-        <div class="quiz-answers">
-            <button class="quiz-answer" type="button">Option 1</button>
-            <button class="quiz-answer" type="button">Option 2</button>
-            <button class="quiz-answer" type="button">Option 3</button>
-            <button class="quiz-answer" type="button">Option 4</button>
+            <p class="quiz-question-text">Placeholder question three?</p>
+
+            <div class="quiz-answers">
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>Option 1</span></label>
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>Option 2</span></label>
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>Option 3</span></label>
+            </div>
+
+            <button class="quiz-next" type="button" data-next-question="results">See Results</button>
+
         </div>
 
+        <div class="quiz-question-space"></div>
+
     </div>
+
+</section>
+
+<!-- ==========================
+     QUIZ RESULTS SECTION
+     Its own full-screen section (like .quiz-intro) rather than a
+     .quiz-question, since it's not asking anything - just showing
+     an output. renderSymptomsList() in script.js's QUIZ section
+     reads every checked .quiz-checkbox across all three questions
+     and rebuilds #symptoms-list as a centered bullet list each
+     time this section scrolls into view (so it stays in sync if
+     the user scrolls back, changes an answer, and returns).
+=========================== -->
+
+<section class="quiz-results" data-question="results">
+
+    <h2 class="quiz-results-title">Symptoms List</h2>
+
+    <ul class="symptoms-list" id="symptoms-list"></ul>
+
+</section>
+
+<!-- ==========================
+     REFERENCES SECTION
+     Barebones - title in the upper right, source links listed
+     below it, all right-aligned. See .references-section in
+     style.css.
+=========================== -->
+
+<section class="references-section">
+
+    <h2 class="references-title">References</h2>
+
+    <ul class="references-list">
+        <li><a href="https://www.cdc.gov/lyme/index.html" target="_blank" rel="noopener">https://www.cdc.gov/lyme/index.html</a></li>
+        <li><a href="https://www.bayarealyme.org/our-research/" target="_blank" rel="noopener">https://www.bayarealyme.org/our-research/</a></li>
+        <li><a href="https://www.hopkinslyme.org/research-at-the-lyme-disease-center/" target="_blank" rel="noopener">https://www.hopkinslyme.org/research-at-the-lyme-disease-center/</a></li>
+    </ul>
 
 </section>
 
@@ -331,11 +407,11 @@
 =========================== -->
 
 <img src="images/symptoms.png" class="zoom-symptoms" alt="">
-<img src="images/symptomgrass.png" class="zoom-symptomgrass" alt="">
+<img src="images/wtick.png" class="zoom-wtick" alt="">
 
-<!-- Caption that fades in once symptomgrass.png has fully landed
+<!-- Caption that fades in once wtick.png has fully landed
      at opacity 1, holds while the image is held static, then fades
-     back out together with symptomgrass.png. Positioned/animated
+     back out together with wtick.png. Positioned/animated
      from script.js alongside the two images - see updateZoomScene(). -->
 <div class="zoom-caption">
     <p>A tick bite can hide in tall grass without you ever feeling it.</p>

@@ -73,7 +73,7 @@ body {
    ZOOM-IN INTRO
    zoom-spacer just reserves the scroll distance the intro plays
    across (measured in script.js). The images themselves are fixed
-   to the viewport - see .zoom-symptoms / .zoom-grass below - so
+   to the viewport - see .zoom-symptoms / .zoom-wtick below - so
    they can play large and centered independent of the sidebar
    column, then shrink down onto it.
 ========================== */
@@ -83,23 +83,23 @@ body {
 }
 
 .zoom-symptoms,
-.zoom-symptomgrass {
+.zoom-wtick {
     position: fixed;
     opacity: 0;
     pointer-events: none;
     /* left/top/width are set frame-by-frame from script.js as the
        user scrolls - no CSS sizing here so the JS math (which
        needs to know the image's true base size) stays authoritative.
-       symptomgrass.png is pre-aligned to the same canvas as
+       wtick.png is pre-aligned to the same canvas as
        symptoms.png, so both are always given the identical box -
-       symptomgrass just sits on top and fades out of it. */
+       wtick just sits on top and fades out of it. */
 }
 
 .zoom-symptoms {
     z-index: 5;
 }
 
-.zoom-symptomgrass {
+.zoom-wtick {
     z-index: 6;
 }
 
@@ -261,7 +261,7 @@ or thinner, does wonders for filling up the blank space*/
        to 0) - and .graphic having one was the actual bug: it sealed
        .marker's z-index:10 inside .graphic's own local context, so
        that 10 could only ever win against other things inside
-       .graphic, never against .zoom-symptoms/.zoom-symptomgrass
+       .graphic, never against .zoom-symptoms/.zoom-wtick
        (z-index 5/6), which live outside .graphic as fixed-position
        siblings.
 
@@ -630,17 +630,33 @@ or thinner, does wonders for filling up the blank space*/
 /* ==========================
    QUIZ SECTION
    Placeholder copy - swap in the real questions/answers whenever
-   they're ready. Each answer is an independent toggle button (see
-   .quiz-answer.selected below and the click handler in script.js's
-   QUIZ ANSWER SELECTION block), not a radio group, since users can
-   select any number of answers per question.
+   they're ready. .quiz-intro (full-screen title + blurb + start
+   button) is its own section, separate from .quiz-section which
+   holds the questions - so question 1 stays off-screen until the
+   user scrolls past the intro or clicks "Start Quiz". Each
+   .quiz-question is its own full screen - text and checkboxes live
+   in .quiz-question-content on the left, .quiz-question-space is an
+   empty flex spacer that keeps the right side of the screen open.
+   "Start Quiz" and "Next" both scroll to the next section - see the
+   QUIZ section in script.js. Checkboxes are plain inputs (not
+   toggle buttons), so any number can be checked per question
+   without extra JS.
 ========================== */
 
+.quiz-intro,
 .quiz-section {
 
     width: 100%;
 
-    padding: 100px 60px;
+    background: #fff;
+
+}
+
+.quiz-intro {
+
+    height: 100vh;
+
+    padding: 0 60px;
 
     display: flex;
 
@@ -648,9 +664,11 @@ or thinner, does wonders for filling up the blank space*/
 
     align-items: center;
 
-    gap: 60px;
+    justify-content: center;
 
-    background: #fff;
+    text-align: center;
+
+    gap: 24px;
 
 }
 
@@ -664,27 +682,101 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
+.quiz-intro-text {
+
+    font-size: 1.2rem;
+
+    max-width: 500px;
+
+    margin: 0 auto;
+
+    text-align: center;
+
+}
+
+.quiz-start {
+
+    font-family: inherit;
+
+    font-size: 1.1rem;
+
+    padding: 14px 40px;
+
+    margin-top: 10px;
+
+    border: 3px solid #333;
+
+    border-radius: 14px;
+
+    background: #333;
+
+    color: #fff;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease, transform 0.1s ease;
+
+}
+
+.quiz-start:hover {
+
+    background: #ff2d3e;
+
+    border-color: #ff2d3e;
+
+    transform: translateY(-2px);
+
+}
+
 .quiz-question {
 
     width: 100%;
 
-    max-width: 900px;
+    min-height: 100vh;
+
+    padding: 0 60px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 40px;
+
+    /* Anchor point for "Start Quiz" / "Next" to scroll to - see
+       the QUIZ section in script.js. */
+    scroll-margin-top: 0;
+
+}
+
+.quiz-question-content {
+
+    width: 50%;
+
+    max-width: 500px;
 
     display: flex;
 
     flex-direction: column;
 
-    align-items: center;
+    align-items: flex-start;
 
     gap: 30px;
 
 }
 
+/* Empty on purpose - reserves the right half of the screen so the
+   question text/checkboxes stay confined to the left. */
+.quiz-question-space {
+
+    flex: 1;
+
+}
+
 .quiz-question-text {
 
-    font-size: 1.4rem;
+    font-size: 1.6rem;
 
-    text-align: center;
+    text-align: left;
 
     margin: 0;
 
@@ -694,29 +786,66 @@ or thinner, does wonders for filling up the blank space*/
 
     width: 100%;
 
-    display: grid;
+    display: flex;
 
-    grid-template-columns: repeat(2, 1fr);
+    flex-direction: column;
 
-    gap: 20px;
+    gap: 18px;
 
 }
 
+/* Plain text with a checkbox to the left - no button styling. */
 .quiz-answer {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    font-size: 1.1rem;
+
+    color: #333;
+
+    cursor: pointer;
+
+}
+
+.quiz-checkbox {
+
+    width: 20px;
+
+    height: 20px;
+
+    flex-shrink: 0;
+
+    accent-color: #ff2d3e;
+
+    cursor: pointer;
+
+}
+
+/* Scrolls the user down to the next question - see the click
+   handler in script.js's QUIZ section. Manual scrolling between
+   questions still works on its own; this button is just a
+   shortcut that always advances by exactly one question. */
+.quiz-next {
 
     font-family: inherit;
 
     font-size: 1.1rem;
 
-    padding: 20px;
+    padding: 14px 40px;
+
+    margin-top: 10px;
 
     border: 3px solid #333;
 
     border-radius: 14px;
 
-    background: rgb(243, 209, 174);
+    background: #333;
 
-    color: #333;
+    color: #fff;
 
     cursor: pointer;
 
@@ -724,22 +853,139 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
-.quiz-answer:hover {
-
-    transform: translateY(-2px);
-
-}
-
-/* Toggled on/off per-button by script.js on click - this is the
-   only state each answer tracks, so any number of these can be
-   active at once within the same question. */
-.quiz-answer.selected {
+.quiz-next:hover {
 
     background: #ff2d3e;
 
     border-color: #ff2d3e;
 
-    color: #fff;
+    transform: translateY(-2px);
+
+}
+
+/* Own full-screen section, styled like .quiz-intro, since it's
+   presenting an output rather than asking a question - see the
+   QUIZ RESULTS SECTION comment in index.html and renderSymptomsList()
+   in script.js. */
+.quiz-results {
+
+    width: 100%;
+
+    height: 100vh;
+
+    background: #fff;
+
+    padding: 0 60px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    gap: 24px;
+
+}
+
+.quiz-results-title {
+
+    font-size: 2.5rem;
+
+    margin: 0;
+
+}
+
+/* Rebuilt each time the section scrolls into view - see
+   renderSymptomsList() in script.js. */
+.symptoms-list {
+
+    list-style: none;
+
+    margin: 0;
+
+    padding: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 14px;
+
+    font-size: 1.2rem;
+
+    max-width: 500px;
+
+}
+
+/* Shown in place of the list when nothing is checked. */
+.symptoms-list-empty {
+
+    color: #777;
+
+    font-style: italic;
+
+}
+
+/* ==========================
+   REFERENCES SECTION
+   Barebones - title top-right, links listed below it, right-aligned.
+========================== */
+
+.references-section {
+
+    width: 100%;
+
+    background: #fff;
+
+    padding: 60px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+}
+
+.references-title {
+
+    font-size: 2rem;
+
+    margin: 0 0 20px;
+
+    text-align: right;
+
+}
+
+.references-list {
+
+    list-style: none;
+
+    margin: 0;
+
+    padding: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    gap: 10px;
+
+    text-align: right;
+
+}
+
+.references-list a {
+
+    color: #333;
 
 }
 
@@ -803,15 +1049,32 @@ or thinner, does wonders for filling up the blank space*/
 
     }
 
-    .quiz-section {
+    .quiz-intro,
+    .quiz-results {
 
-        padding: 60px 20px;
+        padding: 0 20px;
 
     }
 
-    .quiz-answers {
+    .quiz-question {
 
-        grid-template-columns: 1fr;
+        padding: 40px 20px;
+
+        min-height: auto;
+
+    }
+
+    .quiz-question-content {
+
+        width: 100%;
+
+        max-width: none;
+
+    }
+
+    .quiz-question-space {
+
+        display: none;
 
     }
 

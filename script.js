@@ -282,9 +282,9 @@ function refresh() {
 // ZOOM-IN INTRO
 // =====================================================
 //
-// symptomgrass.png (person + grass, pre-aligned by hand onto the
-// same canvas as symptoms.png) and symptoms.png (person only) play
-// as fixed-to-viewport overlays. They shrink and land in the
+// wtick.png (a tick, pre-aligned by hand onto the same canvas as
+// symptoms.png) and symptoms.png (person only) play as
+// fixed-to-viewport overlays. They shrink and land in the
 // sidebar's reserved spot (where the invisible hero-image sits,
 // used only to define that spot's size/position) and then just
 // stay there - symptoms.png is the only image that's ever actually
@@ -294,22 +294,22 @@ function refresh() {
 // Because the two images are pre-aligned to the same canvas, they
 // always share one box - same left/top/width every frame. That
 // makes the first phase a plain crossfade in place, which is what
-// makes it read as "the grass fading in, then away" rather than
+// makes it read as "the tick fading in, then away" rather than
 // two images sliding around independently:
 //
 //   0.00 - 0.20  shared box holds at center-screen, zoomed in.
-//                symptomgrass.png (on top) fades from fully
+//                wtick.png (on top) fades from fully
 //                transparent to fully opaque, over symptoms.png
 //                (underneath, always fully opaque once this phase
 //                starts). Caption still hidden.
-//   0.20 - 0.35  symptomgrass.png now holds fully opaque and static
+//   0.20 - 0.35  wtick.png now holds fully opaque and static
 //                while zoom-caption fades in below the image.
-//   0.35 - 0.45  both symptomgrass.png and the caption hold fully
+//   0.35 - 0.45  both wtick.png and the caption hold fully
 //                visible - a beat to actually read the caption.
-//   0.45 - 0.60  symptomgrass.png and the caption fade back out
+//   0.45 - 0.60  wtick.png and the caption fade back out
 //                together, revealing the person already standing
 //                there underneath.
-//   0.60 - 1.0   symptomgrass.png and the caption are fully gone.
+//   0.60 - 1.0   wtick.png and the caption are fully gone.
 //                Only now does symptoms.png shrink and travel from
 //                center-screen onto the sidebar's reserved spot,
 //                landing exactly on it and staying there.
@@ -323,7 +323,7 @@ function refresh() {
 
 const zoomSpacer = document.querySelector(".zoom-spacer");
 const zoomSymptoms = document.querySelector(".zoom-symptoms");
-const zoomSymptomgrass = document.querySelector(".zoom-symptomgrass");
+const zoomWtick = document.querySelector(".zoom-wtick");
 const zoomCaption = document.querySelector(".zoom-caption");
 const graphicEl = document.querySelector(".graphic");
 const heroImage = document.querySelector(".hero-image");
@@ -334,11 +334,11 @@ const ZOOM_SCALE = 5;   // how "zoomed in" symptoms.png looks at its biggest
 // in CSS pixels.
 const CAPTION_GAP = 24;
 
-// The held-in-place window's internal timeline: symptomgrass.png
+// The held-in-place window's internal timeline: wtick.png
 // fades in, holds while the caption fades in under it, both hold
 // for a beat, then both fade out together. Expressed as fractions
 // of total scroll progress (0-1) - see the phase breakdown above.
-const GRASS_FADE_IN_END = 0.2;
+const TICK_FADE_IN_END = 0.2;
 const CAPTION_FADE_IN_END = 0.35;
 const HOLD_END = 0.45;
 const FADE_OUT_END = 0.6;
@@ -417,7 +417,7 @@ function updateZoomScene() {
     // user ever scrolled this far. Keep them fully hidden instead.
     if (rect.top > 0) {
         zoomSymptoms.style.opacity = 0;
-        zoomSymptomgrass.style.opacity = 0;
+        zoomWtick.style.opacity = 0;
         zoomCaption.style.opacity = 0;
         heroImage.style.opacity = 0;
         return;
@@ -437,7 +437,7 @@ function updateZoomScene() {
     // lands on the identical pixels and reads as instantaneous.
     if (progress >= 1) {
         zoomSymptoms.style.opacity = 0;
-        zoomSymptomgrass.style.opacity = 0;
+        zoomWtick.style.opacity = 0;
         zoomCaption.style.opacity = 0;
         heroImage.style.opacity = 1;
         return;
@@ -451,14 +451,14 @@ function updateZoomScene() {
     const centerX = window.innerWidth / 2;
     const groundY = window.innerHeight / 2;
 
-    let symptomgrassOpacity;
+    let wtickOpacity;
     let captionOpacity;
     let x, bottomY, scale;
 
     if (progress <= FADE_OUT_END) {
 
         // Held at center-screen, zoomed in, for the whole
-        // grass-and-caption sequence: symptomgrass.png fades in,
+        // tick-and-caption sequence: wtick.png fades in,
         // holds static while the caption fades in under it, both
         // hold for a beat, then both fade out together to reveal
         // the person already standing there.
@@ -466,30 +466,30 @@ function updateZoomScene() {
         bottomY = groundY;
         scale = ZOOM_SCALE;
 
-        if (progress <= GRASS_FADE_IN_END) {
-            symptomgrassOpacity = progress / GRASS_FADE_IN_END;
+        if (progress <= TICK_FADE_IN_END) {
+            wtickOpacity = progress / TICK_FADE_IN_END;
             captionOpacity = 0;
         } else if (progress <= CAPTION_FADE_IN_END) {
-            symptomgrassOpacity = 1;
-            captionOpacity = (progress - GRASS_FADE_IN_END) / (CAPTION_FADE_IN_END - GRASS_FADE_IN_END);
+            wtickOpacity = 1;
+            captionOpacity = (progress - TICK_FADE_IN_END) / (CAPTION_FADE_IN_END - TICK_FADE_IN_END);
         } else if (progress <= HOLD_END) {
-            symptomgrassOpacity = 1;
+            wtickOpacity = 1;
             captionOpacity = 1;
         } else {
             const p = (progress - HOLD_END) / (FADE_OUT_END - HOLD_END);
-            symptomgrassOpacity = 1 - p;
+            wtickOpacity = 1 - p;
             captionOpacity = 1 - p;
         }
 
     } else {
 
-        // symptomgrass.png and the caption are fully gone - now
+        // wtick.png and the caption are fully gone - now
         // symptoms.png alone shrinks and travels onto its landing
         // spot in the sidebar, where it stays once it arrives
         // (progress clamps at 1).
         const p = (progress - FADE_OUT_END) / (1 - FADE_OUT_END);
 
-        symptomgrassOpacity = 0;
+        wtickOpacity = 0;
         captionOpacity = 0;
 
         x = lerp(centerX, landing.x, p);
@@ -508,14 +508,14 @@ function updateZoomScene() {
     zoomSymptoms.style.top = top;
     zoomSymptoms.style.opacity = 1;
 
-    zoomSymptomgrass.style.width = `${width}px`;
-    zoomSymptomgrass.style.left = left;
-    zoomSymptomgrass.style.top = top;
-    zoomSymptomgrass.style.opacity = symptomgrassOpacity;
+    zoomWtick.style.width = `${width}px`;
+    zoomWtick.style.left = left;
+    zoomWtick.style.top = top;
+    zoomWtick.style.opacity = wtickOpacity;
 
     // Caption sits centered under the shared image box's bottom
     // edge. Bottom edge stays anchored at groundY throughout the
-    // held phase (only symptoms.png/symptomgrass.png's top moves
+    // held phase (only symptoms.png/wtick.png's top moves
     // to accommodate scale), so the caption doesn't jump around
     // while it fades in/out.
     zoomCaption.style.left = `${x}px`;
@@ -560,7 +560,7 @@ window.addEventListener("resize", () => {
 // Image dimensions (and therefore the landing spot) aren't reliable
 // until the images have actually loaded, so re-measure once they
 // have in addition to the upfront measurement below.
-[zoomSymptoms, zoomSymptomgrass, heroImage].forEach(img => {
+[zoomSymptoms, zoomWtick, heroImage].forEach(img => {
     if (img.complete) {
         measureLanding();
     } else {
@@ -804,20 +804,100 @@ function setUpMapHover() {
 setUpMapHover();
 
 // =====================================================
-// QUIZ ANSWER SELECTION
+// QUIZ NAVIGATION
 // =====================================================
 //
-// Each answer button just toggles its own "selected" state on
-// click - there's no radio-button exclusivity within a question,
-// since users can select any number of answers per question.
+// "Start Quiz" and "Next" both work the same way: jump straight to
+// the question (or the results section) named in their own
+// data-next-question attribute, regardless of where the user has
+// manually scrolled to. Neither tracks which question is "current"
+// on screen - manual scrolling between questions still works
+// independently of this. The selector below matches on
+// data-question generically (not .quiz-question specifically) so
+// it also reaches .quiz-results, whose "See Results" target is
+// "results" rather than a number.
+//
+// Checkboxes need no JS of their own - they're plain inputs, so
+// the browser already handles checked/unchecked state, and any
+// number can be checked per question.
 
-document.querySelectorAll(".quiz-answer").forEach(button => {
+document.querySelectorAll(".quiz-next, .quiz-start").forEach(button => {
 
     button.addEventListener("click", () => {
-        button.classList.toggle("selected");
+
+        const nextNumber = button.dataset.nextQuestion;
+        const nextQuestion = document.querySelector(
+            `[data-question="${nextNumber}"]`
+        );
+
+        if (nextQuestion) {
+            nextQuestion.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
     });
 
 });
+
+// =====================================================
+// QUIZ RESULTS
+// =====================================================
+//
+// Compiles every checked checkbox across all three questions into
+// #symptoms-list. Runs immediately when "See Results" is clicked
+// (so the list is ready before the scroll finishes) and also via
+// IntersectionObserver whenever .quiz-results scrolls into view, so
+// the list stays accurate if the user scrolls back, changes an
+// answer, and returns manually instead of using the button.
+
+const symptomsListEl = document.getElementById("symptoms-list");
+
+function renderSymptomsList() {
+
+    if (!symptomsListEl) return;
+
+    const checkedBoxes = document.querySelectorAll(
+        ".quiz-question .quiz-checkbox:checked"
+    );
+
+    symptomsListEl.innerHTML = "";
+
+    if (checkedBoxes.length === 0) {
+        const emptyItem = document.createElement("li");
+        emptyItem.className = "symptoms-list-empty";
+        emptyItem.textContent = "No symptoms selected.";
+        symptomsListEl.appendChild(emptyItem);
+        return;
+    }
+
+    checkedBoxes.forEach(checkbox => {
+        const label = checkbox.nextElementSibling;
+        const item = document.createElement("li");
+        item.textContent = label ? label.textContent.trim() : "";
+        symptomsListEl.appendChild(item);
+    });
+
+}
+
+document.querySelector('.quiz-next[data-next-question="results"]')
+    ?.addEventListener("click", renderSymptomsList);
+
+const quizResultsSection = document.querySelector(".quiz-results");
+
+if (quizResultsSection) {
+
+    const resultsObserver = new IntersectionObserver(entries => {
+
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                renderSymptomsList();
+            }
+        });
+
+    }, { threshold: 0.5 });
+
+    resultsObserver.observe(quizResultsSection);
+
+}
 
 // =====================================================
 // INITIALIZE
