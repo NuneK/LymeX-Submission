@@ -804,6 +804,22 @@ function setUpMapHover() {
 setUpMapHover();
 
 // =====================================================
+// QUIZ ANSWER SELECTION
+// =====================================================
+//
+// Each answer button just toggles its own "selected" state on
+// click - there's no radio-button exclusivity within a question,
+// since users can select any number of answers per question.
+
+document.querySelectorAll(".quiz-answer").forEach(button => {
+
+    button.addEventListener("click", () => {
+        button.classList.toggle("selected");
+    });
+
+});
+
+// =====================================================
 // INITIALIZE
 // =====================================================
 

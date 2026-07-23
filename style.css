@@ -628,6 +628,122 @@ or thinner, does wonders for filling up the blank space*/
 }
 
 /* ==========================
+   QUIZ SECTION
+   Placeholder copy - swap in the real questions/answers whenever
+   they're ready. Each answer is an independent toggle button (see
+   .quiz-answer.selected below and the click handler in script.js's
+   QUIZ ANSWER SELECTION block), not a radio group, since users can
+   select any number of answers per question.
+========================== */
+
+.quiz-section {
+
+    width: 100%;
+
+    padding: 100px 60px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 60px;
+
+    background: #fff;
+
+}
+
+.quiz-title {
+
+    font-size: 2.5rem;
+
+    margin: 0;
+
+    text-align: center;
+
+}
+
+.quiz-question {
+
+    width: 100%;
+
+    max-width: 900px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 30px;
+
+}
+
+.quiz-question-text {
+
+    font-size: 1.4rem;
+
+    text-align: center;
+
+    margin: 0;
+
+}
+
+.quiz-answers {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px;
+
+}
+
+.quiz-answer {
+
+    font-family: inherit;
+
+    font-size: 1.1rem;
+
+    padding: 20px;
+
+    border: 3px solid #333;
+
+    border-radius: 14px;
+
+    background: rgb(243, 209, 174);
+
+    color: #333;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease, transform 0.1s ease;
+
+}
+
+.quiz-answer:hover {
+
+    transform: translateY(-2px);
+
+}
+
+/* Toggled on/off per-button by script.js on click - this is the
+   only state each answer tracks, so any number of these can be
+   active at once within the same question. */
+.quiz-answer.selected {
+
+    background: #ff2d3e;
+
+    border-color: #ff2d3e;
+
+    color: #fff;
+
+}
+
+/* ==========================
    RESPONSIVE
 ========================== */
 
@@ -684,6 +800,18 @@ or thinner, does wonders for filling up the blank space*/
         width: 90%;
 
         height: 60vh;
+
+    }
+
+    .quiz-section {
+
+        padding: 60px 20px;
+
+    }
+
+    .quiz-answers {
+
+        grid-template-columns: 1fr;
 
     }
 
