@@ -52,6 +52,51 @@ const STEP_ONE_SWAP_1 = 1 / 3;
 const STEP_ONE_SWAP_2 = 2 / 3;
 
 const stepTwoSection = document.querySelector('.step[data-step="2"]');
+const stepTwoTextEl = document.getElementById("step2-sticky-text");
+const stepTwoSecondTextEl = document.getElementById("step2-second-text");
+const stepTwoThirdTextEl = document.getElementById("step2-third-text");
+
+// How much of step 2's scroll progress (0-1) the text block takes to
+// rise from its default centered spot up into the upper third of the
+// left column - kept short and well before swapPoint/liftEnd below,
+// so it's finished settling while tick.png/skin.png are still fading
+// in, and there's still plenty of scroll room left before
+// ticktweezer.png's rise starts.
+const TEXT_RISE_END = 0.15;
+
+// How far (as a fraction of viewport height) the text block travels
+// over that span - moves its centered position (roughly 50vh down
+// inside the sticky 100vh box) up toward the upper third, hence this
+// much vh of travel. Lowered from 0.33 so the block lands a bit
+// further down the page instead of landing right at the upper third.
+const TEXT_RISE_FRACTION = 0.20;
+
+// The second text block starts pushed this far (in vh) below its
+// resting spot in the middle third - enough that it sits fully below
+// the visible viewport until it's animated in.
+const SECOND_TEXT_START_OFFSET = 70;
+
+// The second block only starts rising once ticktweezer.png has fully
+// finished lifting - mirrors liftEnd further down - and finishes
+// rising well before baggieEnd, so it's already resting in place for
+// the rest of the phase where the mini tick travels down behind
+// baggie.png.
+const SECOND_TEXT_RISE_START = 0.55; // matches liftEnd in refresh()
+const SECOND_TEXT_RISE_END = 0.70;
+
+// The third text block starts pushed this far (in vh) below its
+// resting spot in the lower third - same idea as
+// SECOND_TEXT_START_OFFSET above.
+const THIRD_TEXT_START_OFFSET = 70;
+
+// The third block rises in step with doctor.png fading in - both
+// start once the mini tick has finished traveling into baggie.png
+// (progress passes baggieEnd, set below in refresh()) and both land
+// together at DOCTOR_FADE_END. Everything holds in place for the
+// remaining scroll distance after that - see the min-height comment
+// on .step[data-step="2"] in style.css.
+const THIRD_TEXT_RISE_START = 0.65; // matches baggieEnd in refresh()
+const THIRD_TEXT_RISE_END = 0.90; // matches DOCTOR_FADE_END in refresh()
 
 const tickImage = document.getElementById("tick-image");
 const tweezersImage = document.getElementById("tweezers-image");
@@ -103,6 +148,27 @@ function resolveStepOneSubstate() {
 
 }
 
+// How far (in px) before step 1's markers turn on the landed
+// jwtick.png clone starts fading out, finishing exactly as they
+// appear - see updateZoomScene()'s progress >= 1 branch. Tune to
+// taste.
+const JWTICK_FADE_DISTANCE = 500;
+
+function resolveJwtickFadeProgress() {
+
+    const rect = stepOneSection.getBoundingClientRect();
+    const centerY = window.innerHeight / 2;
+
+    // resolveActiveStep() flips currentStep to "1" (and its markers
+    // turn on) the moment rect.top passes centerY - so jwtick.png
+    // needs to be fully faded out by that same point, rather than a
+    // fixed distance past step 1's own top.
+    const fadeStart = centerY + JWTICK_FADE_DISTANCE;
+
+    return clamp((fadeStart - rect.top) / JWTICK_FADE_DISTANCE, 0, 1);
+
+}
+
 // Same idea as resolveStepOneSubstate, but returns a continuous
 // 0-1 value instead of a discrete substate - used to fade
 // tweezers.png in on top of tick.png as the user scrolls through
@@ -133,6 +199,9 @@ function refresh() {
         currentStep = null;
         graphicEl.classList.remove("step2-active");
         tweezersImage.style.opacity = 0;
+        stepTwoTextEl.style.transform = "translateY(0px)";
+        stepTwoSecondTextEl.style.transform = `translateY(${SECOND_TEXT_START_OFFSET}vh)`;
+        stepTwoThirdTextEl.style.transform = `translateY(${THIRD_TEXT_START_OFFSET}vh)`;
         return;
     }
 
@@ -175,7 +244,47 @@ function refresh() {
 
     const swapPoint = 0.35;
     const liftEnd = 0.55;
-    const baggieEnd = 0.8;
+    const baggieEnd = 0.65;
+
+    // doctor.png finishes fading in here (in step with the third
+    // text block landing, via THIRD_TEXT_RISE_END above) - well
+    // before progress reaches 1, so the remaining scroll distance
+    // (reserved via .step[data-step="2"]'s min-height in style.css)
+    // plays as a hold where nothing on screen moves.
+    const DOCTOR_FADE_START = 0.75;
+    const DOCTOR_FADE_END = 0.90;
+
+    // Text block rises out of its centered spot into the upper third
+    // of the left column over the very start of step 2's scroll,
+    // alongside tick.png/skin.png fading in - well ahead of
+    // swapPoint/liftEnd, so there's still a full stretch of scroll
+    // left before ticktweezer.png's rise kicks in.
+    const textRiseProgress = clamp(progress / TEXT_RISE_END, 0, 1);
+    stepTwoTextEl.style.transform =
+        `translateY(-${textRiseProgress * TEXT_RISE_FRACTION * window.innerHeight}px)`;
+
+    // Second text block: stays fully hidden below the viewport until
+    // ticktweezer.png finishes lifting (progress passes
+    // SECOND_TEXT_RISE_START), then slides up over a short span so
+    // it's already resting in place well before baggieEnd, while the
+    // mini tick is still traveling down behind baggie.png.
+    const secondTextRiseProgress = clamp(
+        (progress - SECOND_TEXT_RISE_START) /
+            (SECOND_TEXT_RISE_END - SECOND_TEXT_RISE_START),
+        0, 1
+    );
+    stepTwoSecondTextEl.style.transform =
+        `translateY(${(1 - secondTextRiseProgress) * SECOND_TEXT_START_OFFSET}vh)`;
+
+    // Third text block: same idea, but tied to baggieEnd/DOCTOR_FADE_END
+    // instead, so it rises in step with doctor.png fading in below.
+    const thirdTextRiseProgress = clamp(
+        (progress - THIRD_TEXT_RISE_START) /
+            (THIRD_TEXT_RISE_END - THIRD_TEXT_RISE_START),
+        0, 1
+    );
+    stepTwoThirdTextEl.style.transform =
+        `translateY(${(1 - thirdTextRiseProgress) * THIRD_TEXT_START_OFFSET}vh)`;
 
     if (progress < swapPoint) {
 
@@ -249,11 +358,12 @@ function refresh() {
             // in the lower third of the right column - see
             // #doctor-image in style.css.
 
-            if (progress <= baggieEnd) {
+            if (progress <= DOCTOR_FADE_START) {
                 doctorImage.style.opacity = 0;
             } else {
-                const doctorProgress =
-                    (progress - baggieEnd) / (1 - baggieEnd);
+                const doctorProgress = clamp(
+                    (progress - DOCTOR_FADE_START) / (DOCTOR_FADE_END - DOCTOR_FADE_START), 0, 1
+                );
                 doctorImage.style.opacity = doctorProgress;
             }
         }
@@ -274,6 +384,10 @@ function refresh() {
     tickTweezerImage.style.transform =
         "translateX(-50%) translateY(0px)";
 
+    stepTwoTextEl.style.transform = "translateY(0px)";
+    stepTwoSecondTextEl.style.transform = `translateY(${SECOND_TEXT_START_OFFSET}vh)`;
+    stepTwoThirdTextEl.style.transform = `translateY(${THIRD_TEXT_START_OFFSET}vh)`;
+
 }
 
 }
@@ -283,34 +397,37 @@ function refresh() {
 // =====================================================
 //
 // wtick.png (a tick, pre-aligned by hand onto the same canvas as
-// symptoms.png) and symptoms.png (person only) play as
-// fixed-to-viewport overlays. They shrink and land in the
-// sidebar's reserved spot (where the invisible hero-image sits,
-// used only to define that spot's size/position) and then just
-// stay there - symptoms.png is the only image that's ever actually
-// visible on the right side of the screen. A caption is layered
-// into this same held-in-place window - see zoom-caption below.
+// jwtick.png, which is itself the same size as symptoms.png) and
+// jwtick.png play as fixed-to-viewport overlays. They shrink and
+// land in the sidebar's reserved spot (where the invisible
+// hero-image sits, used only to define that spot's size/position)
+// and then hand off to hero-image (symptoms.png) with a landed
+// jwtick.png clone on top of it - see updateZoomScene()'s
+// progress >= 1 branch. A caption is layered into this same
+// held-in-place window - see zoom-caption below.
 //
-// Because the two images are pre-aligned to the same canvas, they
-// always share one box - same left/top/width every frame. That
-// makes the first phase a plain crossfade in place, which is what
-// makes it read as "the tick fading in, then away" rather than
-// two images sliding around independently:
+// Because wtick.png and jwtick.png are pre-aligned to the same
+// canvas, they always share one box - same left/top/width every
+// frame. That makes the first phase a plain crossfade in place,
+// which is what makes it read as "the tick fading in, then jumping
+// into focus" rather than two images sliding around independently:
 //
 //   0.00 - 0.20  shared box holds at center-screen, zoomed in.
-//                wtick.png (on top) fades from fully
-//                transparent to fully opaque, over symptoms.png
-//                (underneath, always fully opaque once this phase
-//                starts). Caption still hidden.
+//                wtick.png (on top) fades from fully transparent to
+//                fully opaque; jwtick.png (underneath) stays fully
+//                hidden the whole time. Caption still hidden.
+//   0.20          The instant wtick.png finishes fading in,
+//                jwtick.png jumps straight to fully opaque behind
+//                it - no fade of its own.
 //   0.20 - 0.35  wtick.png now holds fully opaque and static
 //                while zoom-caption fades in below the image.
 //   0.35 - 0.45  both wtick.png and the caption hold fully
 //                visible - a beat to actually read the caption.
 //   0.45 - 0.60  wtick.png and the caption fade back out
-//                together, revealing the person already standing
+//                together, revealing jwtick.png already sitting
 //                there underneath.
 //   0.60 - 1.0   wtick.png and the caption are fully gone.
-//                Only now does symptoms.png shrink and travel from
+//                Only now does jwtick.png shrink and travel from
 //                center-screen onto the sidebar's reserved spot,
 //                landing exactly on it and staying there.
 //
@@ -322,17 +439,18 @@ function refresh() {
 // tracks the scrollbar exactly, in both directions.
 
 const zoomSpacer = document.querySelector(".zoom-spacer");
-const zoomSymptoms = document.querySelector(".zoom-symptoms");
+const zoomJwtick = document.querySelector(".zoom-jwtick");
 const zoomWtick = document.querySelector(".zoom-wtick");
 const zoomCaption = document.querySelector(".zoom-caption");
 const graphicEl = document.querySelector(".graphic");
 const heroImage = document.querySelector(".hero-image");
+const landedJwtickImage = document.getElementById("landed-jwtick-image");
 
-const ZOOM_SCALE = 5;   // how "zoomed in" symptoms.png looks at its biggest
+const ZOOM_SCALE = 5;   // how "zoomed in" jwtick.png looks at its biggest
 
 // How much space below the image's bottom edge the caption sits,
 // in CSS pixels.
-const CAPTION_GAP = 24;
+const CAPTION_GAP = 100;
 
 // The held-in-place window's internal timeline: wtick.png
 // fades in, holds while the caption fades in under it, both hold
@@ -353,17 +471,18 @@ function lerp(from, to, t) {
 
 // ---- Landing spot ----
 //
-// symptoms.png needs to shrink down onto exactly the spot reserved
+// jwtick.png needs to shrink down onto exactly the spot reserved
 // by the invisible hero-image in the sidebar, and then just stay
 // there - so it reads as arriving at its final position rather than
 // shrinking indefinitely or overshooting.
 //
-// baseWidth: symptoms.png's own rendered width at scale 1 (mirrors
+// baseWidth: jwtick.png's own rendered width at scale 1 (mirrors
 // the 32vw / 420px cap it used to have in CSS).
 // baseAspect: its natural height/width ratio, used to derive height
-// from width at any scale.
+// from width at any scale. jwtick.png is the same size as
+// symptoms.png, so this doubles as symptoms.png's aspect ratio too.
 //
-// landing: the on-screen point + scale symptoms.png needs to reach
+// landing: the on-screen point + scale jwtick.png needs to reach
 // to line up with the reserved spot. On desktop the sidebar is a
 // full-height sticky column, so once pinned its vertical center
 // always sits at the viewport's vertical center - true no matter
@@ -379,8 +498,8 @@ function measureLanding() {
 
     baseWidth = Math.min(window.innerWidth * 0.32, 420);
 
-    if (zoomSymptoms.naturalWidth) {
-        baseAspect = zoomSymptoms.naturalHeight / zoomSymptoms.naturalWidth;
+    if (zoomJwtick.naturalWidth) {
+        baseAspect = zoomJwtick.naturalHeight / zoomJwtick.naturalWidth;
     }
 
     const heroRect = heroImage.getBoundingClientRect();
@@ -416,34 +535,43 @@ function updateZoomScene() {
     // full-size/center-screen opacity the whole time before the
     // user ever scrolled this far. Keep them fully hidden instead.
     if (rect.top > 0) {
-        zoomSymptoms.style.opacity = 0;
+        zoomJwtick.style.opacity = 0;
         zoomWtick.style.opacity = 0;
         zoomCaption.style.opacity = 0;
         heroImage.style.opacity = 0;
+        landedJwtickImage.style.opacity = 0;
         return;
     }
 
     const progress = clamp(-rect.top / scrollable, 0, 1);
 
     // Once fully landed, hand off from the fixed-position zoom
-    // overlay to the in-place hero-image instead of continuing to
-    // reposition the overlay every frame. hero-image lives inside
-    // .image-wrapper - the same local stacking context as the
-    // .marker elements - so from this point on its z-index actually
-    // gets compared against the markers' directly, rather than
-    // fighting a fixed-position element in a different stacking
-    // context. Because measureLanding() sized/positioned the
+    // overlay to the in-place hero-image/landed-jwtick-image pair
+    // instead of continuing to reposition the overlay every frame.
+    // Both live inside .image-wrapper - the same local stacking
+    // context as the .marker elements - so from this point on their
+    // z-index actually gets compared against the markers' directly,
+    // rather than fighting a fixed-position element in a different
+    // stacking context. Because measureLanding() sized/positioned the
     // overlay to exactly match heroImage's own rect, this swap
     // lands on the identical pixels and reads as instantaneous.
     if (progress >= 1) {
-        zoomSymptoms.style.opacity = 0;
+        zoomJwtick.style.opacity = 0;
         zoomWtick.style.opacity = 0;
         zoomCaption.style.opacity = 0;
         heroImage.style.opacity = 1;
+        // jwtick.png has landed already fully opaque, hiding
+        // symptoms.png (which sits at full opacity underneath it,
+        // unchanged, for the rest of the page). It stays that way
+        // until the user scrolls into step 1, then fades out over
+        // resolveJwtickFadeProgress() to reveal symptoms.png as
+        // "It Starts with a Tick Bite" appears.
+        landedJwtickImage.style.opacity = 1 - resolveJwtickFadeProgress();
         return;
     }
 
     heroImage.style.opacity = 0;
+    landedJwtickImage.style.opacity = 0;
 
     // Both overlays are pre-aligned to the same canvas, so they
     // always get the identical box - x is the shared horizontal
@@ -484,7 +612,7 @@ function updateZoomScene() {
     } else {
 
         // wtick.png and the caption are fully gone - now
-        // symptoms.png alone shrinks and travels onto its landing
+        // jwtick.png alone shrinks and travels onto its landing
         // spot in the sidebar, where it stays once it arrives
         // (progress clamps at 1).
         const p = (progress - FADE_OUT_END) / (1 - FADE_OUT_END);
@@ -503,10 +631,14 @@ function updateZoomScene() {
     const left = `${x - width / 2}px`;
     const top = `${bottomY - height}px`;
 
-    zoomSymptoms.style.width = `${width}px`;
-    zoomSymptoms.style.left = left;
-    zoomSymptoms.style.top = top;
-    zoomSymptoms.style.opacity = 1;
+    zoomJwtick.style.width = `${width}px`;
+    zoomJwtick.style.left = left;
+    zoomJwtick.style.top = top;
+    // Stays hidden while wtick.png is still fading in on its own;
+    // the instant wtick.png finishes (progress passes
+    // TICK_FADE_IN_END), jwtick.png jumps straight to full opacity
+    // behind it - no fade of its own.
+    zoomJwtick.style.opacity = progress <= TICK_FADE_IN_END ? 0 : 1;
 
     zoomWtick.style.width = `${width}px`;
     zoomWtick.style.left = left;
@@ -515,7 +647,7 @@ function updateZoomScene() {
 
     // Caption sits centered under the shared image box's bottom
     // edge. Bottom edge stays anchored at groundY throughout the
-    // held phase (only symptoms.png/wtick.png's top moves
+    // held phase (only jwtick.png/wtick.png's top moves
     // to accommodate scale), so the caption doesn't jump around
     // while it fades in/out.
     zoomCaption.style.left = `${x}px`;
@@ -560,7 +692,7 @@ window.addEventListener("resize", () => {
 // Image dimensions (and therefore the landing spot) aren't reliable
 // until the images have actually loaded, so re-measure once they
 // have in addition to the upfront measurement below.
-[zoomSymptoms, zoomWtick, heroImage].forEach(img => {
+[zoomJwtick, zoomWtick, heroImage].forEach(img => {
     if (img.complete) {
         measureLanding();
     } else {

@@ -73,7 +73,7 @@ body {
    ZOOM-IN INTRO
    zoom-spacer just reserves the scroll distance the intro plays
    across (measured in script.js). The images themselves are fixed
-   to the viewport - see .zoom-symptoms / .zoom-wtick below - so
+   to the viewport - see .zoom-jwtick / .zoom-wtick below - so
    they can play large and centered independent of the sidebar
    column, then shrink down onto it.
 ========================== */
@@ -82,7 +82,7 @@ body {
     height: 250vh;
 }
 
-.zoom-symptoms,
+.zoom-jwtick,
 .zoom-wtick {
     position: fixed;
     opacity: 0;
@@ -91,11 +91,11 @@ body {
        user scrolls - no CSS sizing here so the JS math (which
        needs to know the image's true base size) stays authoritative.
        wtick.png is pre-aligned to the same canvas as
-       symptoms.png, so both are always given the identical box -
+       jwtick.png, so both are always given the identical box -
        wtick just sits on top and fades out of it. */
 }
 
-.zoom-symptoms {
+.zoom-jwtick {
     z-index: 5;
 }
 
@@ -120,8 +120,7 @@ body {
     margin: 0;
     font-size: 1.4rem;
     line-height: 1.6;
-    color: #fff;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    color: #333;
 }
 
 /* ==========================
@@ -167,7 +166,13 @@ or thinner, does wonders for filling up the blank space*/
    block in script.js's refresh()), so it gets extra scroll runway
    again. */
 .step[data-step="2"] {
-    min-height: 260vh;
+    /* Bumped up from 260vh - the extra ~40vh is deliberately not
+       tied to any animation. Everything (doctor.png fading in and
+       the third text block landing) finishes by DOCTOR_FADE_END in
+       script.js, well before this section's scroll runs out, so
+       that leftover distance plays as a pause where scrolling
+       doesn't change anything on screen before step 2 releases. */
+    min-height: 300vh;
 }
 
 .sticky-step-text {
@@ -212,6 +217,51 @@ or thinner, does wonders for filling up the blank space*/
     /* Wait for the outgoing paragraph's 0.6s fade-out to finish
        before this one starts fading in, so they never overlap. */
     transition-delay: 0.6s;
+}
+
+/* Occupies the middle third of the sticky 100vh box, positioned
+   absolutely so it's independent of .step-text-wrap's
+   flex-centered flow above it - lets it stay hidden below the
+   viewport and slide up into place on its own schedule (see
+   stepTwoSecondTextEl in script.js) without disturbing the first
+   text block's own rise animation. */
+.step2-second-text {
+
+    position: absolute;
+
+    top: 45%;
+
+    height: 33.33%;
+
+    left: 0;
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+}
+
+/* Same pattern as .step2-second-text, but rests in the lower third
+   of the sticky box, in step with doctor.png fading in on the right
+   - see stepTwoThirdTextEl in script.js. */
+.step2-third-text {
+
+    position: absolute;
+
+    top: 70%;
+
+    height: 33.33%;
+
+    left: 0;
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
 }
 
 .step.active {
@@ -261,7 +311,7 @@ or thinner, does wonders for filling up the blank space*/
        to 0) - and .graphic having one was the actual bug: it sealed
        .marker's z-index:10 inside .graphic's own local context, so
        that 10 could only ever win against other things inside
-       .graphic, never against .zoom-symptoms/.zoom-wtick
+       .graphic, never against .zoom-jwtick/.zoom-wtick
        (z-index 5/6), which live outside .graphic as fixed-position
        siblings.
 
@@ -273,8 +323,8 @@ or thinner, does wonders for filling up the blank space*/
        .graphic's green background, having no z-index of its own,
        stays at the lower "positioned, z-index:auto" paint layer,
        below both zoom overlays. Net effect: green panel (bottom),
-       landed symptoms.png (middle), markers via image-wrapper
-       (top). */
+       landed symptoms.png, landed jwtick.png on top of it, markers
+       via image-wrapper (top). */
 
     height: 100vh;
 
@@ -457,13 +507,47 @@ or thinner, does wonders for filling up the blank space*/
        from while hidden, to reserve this spot's size/position for
        both the incoming zoom overlay and the markers below). Once
        the zoom-in animation finishes landing, script.js sets this
-       to opacity: 1 and hides the fixed .zoom-symptoms overlay in
-       the same frame - handing off to this image instead, since it
-       lives inside .image-wrapper alongside the markers and so
-       stacks against them directly, rather than needing its
-       z-index compared against a fixed-position element in a
-       different stacking context. */
+       to opacity: 1 and hides the fixed .zoom-jwtick overlay in
+       the same frame, handing off to .landed-jwtick-image (which sits
+       directly on top of this element, see below) instead - since
+       both live inside .image-wrapper alongside the markers and so
+       stack against them directly, rather than needing z-index
+       compared against a fixed-position element in a different
+       stacking context. symptoms.png itself stays fully opaque from
+       that point on - it's .landed-jwtick-image that later fades away
+       to reveal it, once the user scrolls into step 1. */
     opacity: 0;
+
+    z-index: 1;
+
+}
+
+/* Sits exactly on top of hero-image - width/height: 100% fills the
+   same box, since .image-wrapper is sized off hero-image (the only
+   in-flow content inside it) and jwtick.png is the same size as
+   symptoms.png. Starts hidden, jumps to fully opaque the instant the
+   fixed .zoom-jwtick overlay finishes landing on this same spot (see
+   updateZoomScene() in script.js), then fades out over the start of
+   step 1's scroll via resolveJwtickFadeProgress() - no CSS transition
+   here since it's driven frame-by-frame from scroll position, same
+   pattern as #tweezers-image. */
+.landed-jwtick-image {
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    z-index: 2;
 
 }
 
@@ -543,9 +627,28 @@ or thinner, does wonders for filling up the blank space*/
 
 /* ==========================
    MAP SECTION
+   .map-section reserves extra scroll distance (200vh); .map-sticky
+   pins to the viewport for that whole distance (position: sticky,
+   same pattern as .sticky-text and .graphic elsewhere on the page)
+   so the map holds in place on screen rather than scrolling past
+   within a single screen's worth of scrolling.
 ========================== */
 
 .map-section {
+
+    width: 100%;
+
+    height: 200vh;
+
+    padding: 0;
+
+}
+
+.map-sticky {
+
+    position: sticky;
+
+    top: 0;
 
     width: 100%;
 
@@ -1025,11 +1128,19 @@ or thinner, does wonders for filling up the blank space*/
 
     .map-section {
 
-        flex-direction: column;
-
         height: auto;
 
         padding: 40px 0;
+
+    }
+
+    .map-sticky {
+
+        position: relative;
+
+        flex-direction: column;
+
+        height: auto;
 
     }
 

@@ -38,15 +38,19 @@
 
 <!-- ==========================
      MAIN SCROLL STORY
-     The zoom-in intro (symptoms.png + wtick.png) plays as overlays
+     The zoom-in intro (jwtick.png + wtick.png) plays as overlays
      fixed to the viewport, then shrinks down onto the sidebar's
-     reserved spot. The instant it fully lands, script.js hides
-     those fixed overlays and reveals hero-image in their place -
-     hero-image lives inside .image-wrapper alongside the markers,
-     so its stacking order compares directly against theirs instead
-     of fighting a fixed-position element in a separate stacking
-     context. zoom-spacer just reserves the scroll distance the
-     zoom animation plays across.
+     reserved spot. The instant it fully lands, script.js hides those
+     fixed overlays and reveals hero-image (symptoms.png, already at
+     full opacity underneath) plus a landed jwtick.png clone stacked
+     directly on top of it - hero-image and the landed clone both
+     live inside .image-wrapper alongside the markers, so their
+     stacking order compares directly against the markers' instead of
+     fighting a fixed-position element in a separate stacking
+     context. As the user then scrolls into step 1, the landed
+     jwtick.png clone fades out to reveal symptoms.png underneath -
+     see resolveJwtickFadeProgress() in script.js. zoom-spacer just
+     reserves the scroll distance the zoom-in animation plays across.
 =========================== -->
 
 <div class="container">
@@ -147,14 +151,53 @@
 </section>
 
         <section class="step" data-step="2">
-    <div class="sticky-step-text">
-            <h2>What Does Lyme Disease Look Like?</h2>
+    <div class="sticky-step-text" id="step2-sticky-text">
 
-            <p>
-                Many of the symptoms that develop in Lyme infections appear in other common diseases 
-                and are commonly confused with each other - that’s why it’s so hard to nail down a 
-                Lyme Disease diagnosis. Also, finding the tick can be really hard.
-            </p>
+            <div class="step-text-wrap">
+                <div class="step-text active-text">
+                    <p>
+                        Removing the tick properly is very important, as if the tick is improperly removed, there's is a chance of infection occuring
+                    </p>
+
+                    <p>
+                        Grip the tick with a pair of tweezers as close to the skin as possible, and steadily pull. It may take a few moments.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Second block of step 2 text. Sits absolutely in the
+                 middle third of the sticky 100vh box (see
+                 .step2-second-text in style.css), independent of
+                 .step-text-wrap's flex-centered flow above it -
+                 starts pushed below the viewport and stays hidden
+                 there until ticktweezer.png finishes lifting, then
+                 slides up to rest in place, already static by the
+                 time tick.png travels down behind baggie.png - see
+                 stepTwoSecondTextEl / SECOND_TEXT_RISE_START/END in
+                 script.js. -->
+            <div class="step2-second-text" id="step2-second-text">
+                <p>second set of text here</p>
+            </div>
+
+            <!-- Third block of step 2 text. Sits absolutely in the
+                 lower third of the sticky 100vh box (see
+                 .step2-third-text in style.css), same pattern as
+                 step2-second-text above - starts pushed below the
+                 viewport and stays hidden there until baggie.png's
+                 mini-tick has finished traveling in (progress passes
+                 baggieEnd), then slides up in step with doctor.png
+                 fading in, landing right as doctor.png reaches full
+                 opacity - see stepTwoThirdTextEl /
+                 THIRD_TEXT_RISE_START/END and DOCTOR_FADE_END in
+                 script.js. The extra scroll room added to
+                 .step[data-step="2"]'s min-height past that point is
+                 deliberately inert - progress is clamped past
+                 DOCTOR_FADE_END, so nothing here moves again until
+                 step 2 lets go, giving the reader a pause once this
+                 text lands before the page continues scrolling. -->
+            <div class="step2-third-text" id="step2-third-text">
+                <p>third set of text here</p>
+            </div>
 
      </div>
         </section>
@@ -171,6 +214,16 @@
     <div class="image-wrapper">
 
         <img src="images/symptoms.png" class="hero-image">
+
+        <!-- Sits exactly on top of hero-image (same box, see
+             .landed-jwtick-image in style.css). Lands here already
+             fully opaque, handed off from the fixed .zoom-jwtick
+             overlay once it finishes shrinking - then fades out over
+             the start of step 1's scroll (as "It Starts with a Tick
+             Bite" appears) to reveal symptoms.png underneath, which
+             has been sitting at full opacity the whole time. See
+             resolveJwtickFadeProgress() in script.js. -->
+        <img src="images/jwtick.png" class="landed-jwtick-image" id="landed-jwtick-image">
 
         <!-- "Especially during summer and fall..." -->
         <div class="marker" id="m-1a-1"></div>
@@ -235,6 +288,14 @@
      left, USmap.png filling the rest of the section - see
      .map-section / .map-text / .map-image in style.css.
 
+     .map-section itself reserves extra scroll distance (200vh);
+     .map-sticky pins to the viewport (position: sticky, like
+     .sticky-text and .graphic elsewhere on the page) for that
+     whole distance so the map holds in place instead of scrolling
+     past in one screen's worth of scrolling. Disabled on mobile
+     (see the max-width: 900px block) to match .graphic's mobile
+     behavior.
+
      The 8 region-outline images are absolutely stacked on top of
      USmap.png at identical size/position (see .map-image-wrapper
      and .region-overlay in style.css) and start hidden. script.js's
@@ -244,6 +305,8 @@
 =========================== -->
 
 <section class="map-section">
+
+  <div class="map-sticky">
 
     <div class="map-text">
         <p id="map-text-content">Move your cursor over the area of interest</p>
@@ -263,6 +326,8 @@
         <img src="images/noncontinental.png" alt="" class="region-overlay" id="region-noncontinent">
 
     </div>
+
+  </div>
 
 </section>
 
@@ -401,12 +466,16 @@
      Fixed to the viewport (not confined to the sidebar column) so
      it can play large and centered, then shrink toward the
      sidebar's reserved spot. The instant it fully lands, script.js
-     hides both of these and reveals hero-image instead (see
-     .hero-image in style.css) - so from that point on, the visible
-     image lives in the same stacking context as the markers.
+     hides both of these and reveals hero-image (symptoms.png) plus
+     the landed jwtick.png clone stacked on top of it instead (see
+     .hero-image and .landed-jwtick-image in style.css) - so from
+     that point on, the visible images live in the same stacking
+     context as the markers. jwtick.png doesn't disappear once it
+     lands - see .landed-jwtick-image's fade-out as the user scrolls
+     into step 1.
 =========================== -->
 
-<img src="images/symptoms.png" class="zoom-symptoms" alt="">
+<img src="images/jwtick.png" class="zoom-jwtick" alt="">
 <img src="images/wtick.png" class="zoom-wtick" alt="">
 
 <!-- Caption that fades in once wtick.png has fully landed
@@ -414,7 +483,7 @@
      back out together with wtick.png. Positioned/animated
      from script.js alongside the two images - see updateZoomScene(). -->
 <div class="zoom-caption">
-    <p>A tick bite can hide in tall grass without you ever feeling it.</p>
+    <p>A tick can hide in tall grass and latch on without you ever feeling it.</p>
 </div>
 
 
