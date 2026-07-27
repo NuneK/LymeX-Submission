@@ -7,7 +7,7 @@
 
 <!--This is where we write the title of the whole webpage-->
 
-    <title>Lyme Disease</title>
+    <title>Could It Be Lyme?</title>
 
     <link rel="stylesheet" href="style.css">
 
@@ -21,7 +21,7 @@
 <section class="intro">
     <div class="sticky-text">
         <h1>
-            What is Lyme Disease?
+            Could It Be Lyme Disease?
         </h1>
 
         <p>
@@ -175,9 +175,17 @@
                  time tick.png travels down behind baggie.png - see
                  stepTwoSecondTextEl / SECOND_TEXT_RISE_START/END in
                  script.js. -->
-            <div class="step2-second-text" id="step2-second-text">
-                <p>second set of text here</p>
-            </div>
+<div class="step2-second-text" id="step2-second-text">
+    <div class="step-text active-text">
+        <p>
+            Once the tick has been removed, you can place it inside a plastic bag, or other well-sealed container. You may want to get the tick tested to see if it is carrying Lyme disease.
+        </p>
+
+        <p>
+            Knowing if the tick is carrying the disease is important to take the correct next steps.
+        </p>
+    </div>
+</div>
 
             <!-- Third block of step 2 text. Sits absolutely in the
                  lower third of the sticky 100vh box (see
@@ -195,9 +203,17 @@
                  DOCTOR_FADE_END, so nothing here moves again until
                  step 2 lets go, giving the reader a pause once this
                  text lands before the page continues scrolling. -->
-            <div class="step2-third-text" id="step2-third-text">
-                <p>third set of text here</p>
-            </div>
+<div class="step2-third-text" id="step2-third-text">
+    <div class="step-text active-text">
+        <p>
+            With or without the tick, it's important to bring the list of symptoms to your doctor, so they can properly assess your condition.
+        </p>
+
+        <p>
+            It can be difficult to narrow down symptoms to being caused by Lyme disease, so providing your doctor with as much information as possible is important.
+        </p>
+    </div>
+</div>
 
      </div>
         </section>
@@ -225,6 +241,24 @@
              resolveJwtickFadeProgress() in script.js. -->
         <img src="images/jwtick.png" class="landed-jwtick-image" id="landed-jwtick-image">
 
+        <!-- Sits on top of hero-image/landed-jwtick-image, same box
+             (same size as symptoms.png). Starts hidden and fades in
+             in place of the old "Following a tick bite..." markers,
+             once the user reaches that chunk of step 1's text - see
+             the shortlyme-image visibility toggle in script.js's
+             refresh(). Fades back out if the user scrolls away from
+             that chunk in either direction. -->
+        <img src="images/shortlyme.png" class="shortlyme-image" id="shortlyme-image" alt="">
+
+        <!-- Sits on top of hero-image/landed-jwtick-image, same box
+             (same size as symptoms.png). Starts hidden and fades in
+             in place of the old "Long Lyme is a serious condition..."
+             markers, once the user reaches that chunk of step 1's
+             text - see the longlyme-image visibility toggle in
+             script.js's refresh(). Fades back out if the user
+             scrolls away from that chunk. -->
+        <img src="images/longlyme.png" class="longlyme-image" id="longlyme-image" alt="">
+
         <!-- "Especially during summer and fall..." -->
         <div class="marker" id="m-1a-1"></div>
         <div class="marker" id="m-1a-2"></div>
@@ -233,21 +267,6 @@
         <div class="marker" id="m-1a-5"></div>
         <div class="marker" id="m-1a-6"></div>
         <div class="marker" id="m-1a-7"></div>
-
-        <!-- "If you find a tick, remove it..." -->
-        <div class="marker" id="m-1b-1"></div>
-        <div class="marker" id="m-1b-2"></div>
-        <div class="marker" id="m-1b-3"></div>
-        <div class="marker" id="m-1b-4"></div>
-        <div class="marker" id="m-1b-5"></div>
-
-        <!-- "Long Lyme is a serious condition..." -->
-        <div class="marker" id="m-1c-1"></div>
-        <div class="marker" id="m-1c-2"></div>
-        <div class="marker" id="m-1c-3"></div>
-        <div class="marker" id="m-1c-4"></div>
-        <div class="marker" id="m-1c-5"></div>
-        <div class="marker" id="m-1c-6"></div>
 
     </div>
 

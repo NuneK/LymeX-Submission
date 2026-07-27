@@ -211,6 +211,13 @@ or thinner, does wonders for filling up the blank space*/
     transition: opacity 0.6s ease;
 }
 
+.step2-second-text .step-text,
+.step2-third-text .step-text {
+    position: static;
+    opacity: 1;
+    width: 100%;
+    transition: none;
+}
 
 .step-text.active-text {
     opacity: 1;
@@ -229,7 +236,7 @@ or thinner, does wonders for filling up the blank space*/
 
     position: absolute;
 
-    top: 45%;
+    top: 55%;
 
     height: 33.33%;
 
@@ -250,7 +257,7 @@ or thinner, does wonders for filling up the blank space*/
 
     position: absolute;
 
-    top: 70%;
+    top: 85%;
 
     height: 33.33%;
 
@@ -551,6 +558,73 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
+/* Sits exactly on top of hero-image/landed-jwtick-image - same box,
+   since shortlyme.png/longlyme.png are the same size as symptoms.png.
+   Starts hidden and crossfades in/out via the .visible toggle
+   (added/removed from script.js's refresh() based on step 1's
+   substate), rather than tracking scroll position frame-by-frame like
+   .landed-jwtick-image does - it only ever has two states (shown for
+   its matching text chunk, hidden otherwise), so a CSS transition on
+   opacity is enough. Sits below the remaining markers (z-index 3 vs.
+   10) so it doesn't cover the ones still showing for the 1a chunk. */
+.shortlyme-image {
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    z-index: 3;
+
+    transition: opacity 0.6s ease;
+
+}
+
+.shortlyme-image.visible {
+
+    opacity: 1;
+
+}
+
+/* Same pattern as .shortlyme-image above, for the "Long Lyme is a
+   serious condition..." chunk. */
+.longlyme-image {
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    z-index: 3;
+
+    transition: opacity 0.6s ease;
+
+}
+
+.longlyme-image.visible {
+
+    opacity: 1;
+
+}
+
 .marker {
 
     position: absolute;
@@ -598,21 +672,6 @@ or thinner, does wonders for filling up the blank space*/
 #m-1a-5 { top: 48%; left: 25%; }
 #m-1a-6 { top: 57%; left: 50%; }
 #m-1a-7 { top: 92%; left: 46%; }
-
-/* "If you find a tick, remove it..." - 5 markers */
-#m-1b-1 { top: 58%; left: 35%; }
-#m-1b-2 { top: 58%; left: 65%; }
-#m-1b-3 { top: 68%; left: 50%; }
-#m-1b-4 { top: 78%; left: 32%; }
-#m-1b-5 { top: 78%; left: 68%; }
-
-/* "Long Lyme is a serious condition..." - 6 markers */
-#m-1c-1 { top: 75%; left: 60%; }
-#m-1c-2 { top: 77%; left: 60%; }
-#m-1c-3 { top: 79%; left: 60%; }
-#m-1c-4 { top: 81%; left: 60%; }
-#m-1c-5 { top: 83%; left: 60%; }
-#m-1c-6 { top: 85%; left: 60%; }
 
 /* ==========================
    ACTIVE STEP HIGHLIGHT
@@ -751,7 +810,7 @@ or thinner, does wonders for filling up the blank space*/
 
     width: 100%;
 
-    background: #fff;
+    background: rgb(243, 209, 174);
 
 }
 
@@ -813,7 +872,7 @@ or thinner, does wonders for filling up the blank space*/
 
     background: #333;
 
-    color: #fff;
+    color: rgb(243, 209, 174);
 
     cursor: pointer;
 
@@ -948,7 +1007,7 @@ or thinner, does wonders for filling up the blank space*/
 
     background: #333;
 
-    color: #fff;
+    color: rgb(243, 209, 174);
 
     cursor: pointer;
 
@@ -976,7 +1035,7 @@ or thinner, does wonders for filling up the blank space*/
 
     height: 100vh;
 
-    background: #fff;
+    background: rgb(243, 209, 174);
 
     padding: 0 60px;
 
@@ -1044,7 +1103,7 @@ or thinner, does wonders for filling up the blank space*/
 
     width: 100%;
 
-    background: #fff;
+    background: rgb(243, 209, 174);
 
     padding: 60px;
 
@@ -1171,7 +1230,7 @@ or thinner, does wonders for filling up the blank space*/
 
         padding: 40px 20px;
 
-        min-height: auto;
+        min-height: auto; f
 
     }
 

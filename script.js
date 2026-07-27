@@ -3,9 +3,7 @@
 // =====================================================
 
 const sectionMarkers = {
-    "1a": ["m-1a-1", "m-1a-2", "m-1a-3", "m-1a-4", "m-1a-5", "m-1a-6", "m-1a-7"],
-    "1b": ["m-1b-1", "m-1b-2", "m-1b-3", "m-1b-4", "m-1b-5"],
-    "1c": ["m-1c-1", "m-1c-2", "m-1c-3", "m-1c-4", "m-1c-5", "m-1c-6"]
+    "1a": ["m-1a-1", "m-1a-2", "m-1a-3", "m-1a-4", "m-1a-5", "m-1a-6", "m-1a-7"]
 };
 
 // =====================================================
@@ -47,6 +45,8 @@ const steps = Array.from(document.querySelectorAll(".step"));
 
 const stepOneSection = document.querySelector('.step[data-step="1"]');
 const stepOneTexts = stepOneSection.querySelectorAll(".step-text");
+const shortlymeImage = document.getElementById("shortlyme-image");
+const longlymeImage = document.getElementById("longlyme-image");
 
 const STEP_ONE_SWAP_1 = 1 / 3;
 const STEP_ONE_SWAP_2 = 2 / 3;
@@ -196,6 +196,8 @@ function refresh() {
             currentMarkerKey = null;
             showMarkers(null);
         }
+        shortlymeImage.classList.remove("visible");
+        longlymeImage.classList.remove("visible");
         currentStep = null;
         graphicEl.classList.remove("step2-active");
         tweezersImage.style.opacity = 0;
@@ -223,6 +225,16 @@ function refresh() {
 
         markerKey = substate;
 
+        // shortlyme.png / longlyme.png fade in over symptoms.png in
+        // place of the old m-1b / m-1c markers, each for its own text
+        // chunk only - and fade back out again if the user scrolls
+        // away to either of the other two chunks.
+        shortlymeImage.classList.toggle("visible", substate === "1b");
+        longlymeImage.classList.toggle("visible", substate === "1c");
+
+    } else {
+        shortlymeImage.classList.remove("visible");
+        longlymeImage.classList.remove("visible");
     }
 
     if (markerKey !== currentMarkerKey) {
