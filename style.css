@@ -8,7 +8,7 @@
 
 body {
     margin: 0;
-    font-family: 'Comic Sans MS', "Comic Sans", cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', "Comic Sans", cursive;
     color: #333;
     background: rgb(243, 209, 174);
 }
@@ -388,10 +388,15 @@ or thinner, does wonders for filling up the blank space*/
 
     z-index: 10;
 
-    /* Lets step 2 fade symptoms.png (and its markers, which live
-       inside this wrapper) out as a unit - see .graphic.step2-active
-       below and the step2-active toggle in script.js's refresh(). */
-    transition: opacity 0.8s ease;
+    transition: opacity 0.6s ease;
+
+    /* Lets symptoms.png (and its markers, which live inside this
+       wrapper) fade out as a unit once step 2 is reached - see
+       .graphic.step2-active below, which now drives this directly
+       (no more scroll-driven transform from the removed
+       step-transition section). The transition above lives here
+       (rather than only on the .step2-active variant) so the fade
+       is smooth in both directions if the user scrolls back up too. */
 
 }
 
@@ -429,12 +434,14 @@ or thinner, does wonders for filling up the blank space*/
 
 #skin-image {
     z-index: 15;
-    transition: opacity 0.8s ease;
+    /* No CSS transition here - opacity is driven frame-by-frame from
+       scroll position (see textRiseProgress in script.js), in sync
+       with #tick-image, so the two fade in together rather than one
+       lagging behind the other. */
 }
 
 #tick-image {
     z-index: 16;
-    transition: opacity 0.01s ease;
 }
 
 #tweezers-image {
@@ -493,13 +500,13 @@ or thinner, does wonders for filling up the blank space*/
     opacity: 0;
 }
 
+/* symptoms.png fades out once step 2 begins - simple CSS-transition
+   crossfade against skin.png/tick.png fading in via their own
+   scroll-driven opacity (see the currentStep === "2" block in
+   script.js's refresh()), now that step 1 leads directly into step 2
+   with no step-transition section in between. */
 .graphic.step2-active .image-wrapper {
     opacity: 0;
-}
-
-.graphic.step2-active #skin-image,
-.graphic.step2-active #tick-image {
-    opacity: 1;
 }
 
 .hero-image {
@@ -729,6 +736,14 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
+.map-title {
+
+    font-size: 2rem;
+
+    margin: 0 0 16px;
+
+}
+
 .map-text p {
 
     font-size: 1.3rem;
@@ -792,17 +807,21 @@ or thinner, does wonders for filling up the blank space*/
 /* ==========================
    QUIZ SECTION
    Placeholder copy - swap in the real questions/answers whenever
-   they're ready. .quiz-intro (full-screen title + blurb + start
-   button) is its own section, separate from .quiz-section which
+   they're ready. .quiz-intro is separate from .quiz-section which
    holds the questions - so question 1 stays off-screen until the
-   user scrolls past the intro or clicks "Start Quiz". Each
-   .quiz-question is its own full screen - text and checkboxes live
-   in .quiz-question-content on the left, .quiz-question-space is an
-   empty flex spacer that keeps the right side of the screen open.
-   "Start Quiz" and "Next" both scroll to the next section - see the
-   QUIZ section in script.js. Checkboxes are plain inputs (not
-   toggle buttons), so any number can be checked per question
-   without extra JS.
+   user scrolls past the intro or clicks "Start Quiz". .quiz-intro
+   itself reserves 200vh of scroll distance, with its title/blurb/
+   button content living in .quiz-intro-sticky, which pins to the
+   viewport (position: sticky) for that whole distance - same
+   pattern as .map-section/.map-sticky above - so the intro holds on
+   screen longer instead of clearing in one screen's worth of
+   scrolling. Each .quiz-question is its own full screen - text and
+   checkboxes live in .quiz-question-content on the left,
+   .quiz-question-space is an empty flex spacer that keeps the right
+   side of the screen open. "Start Quiz" and "Next" both scroll to
+   the next section - see the QUIZ section in script.js. Checkboxes
+   are plain inputs (not toggle buttons), so any number can be
+   checked per question without extra JS.
 ========================== */
 
 .quiz-intro,
@@ -815,6 +834,20 @@ or thinner, does wonders for filling up the blank space*/
 }
 
 .quiz-intro {
+
+    height: 200vh;
+
+    padding: 0;
+
+}
+
+.quiz-intro-sticky {
+
+    position: sticky;
+
+    top: 0;
+
+    width: 100%;
 
     height: 100vh;
 
@@ -1094,6 +1127,19 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
+/* Reminder shown below the symptoms list. */
+.quiz-results-note {
+
+    font-size: 1rem;
+
+    font-style: italic;
+
+    color: #555;
+
+    margin: 0;
+
+}
+
 /* ==========================
    REFERENCES SECTION
    Barebones - title top-right, links listed below it, right-aligned.
@@ -1219,7 +1265,22 @@ or thinner, does wonders for filling up the blank space*/
 
     }
 
-    .quiz-intro,
+    .quiz-intro {
+
+        height: auto;
+
+    }
+
+    .quiz-intro-sticky {
+
+        position: relative;
+
+        height: auto;
+
+        padding: 60px 20px;
+
+    }
+
     .quiz-results {
 
         padding: 0 20px;
@@ -1230,7 +1291,7 @@ or thinner, does wonders for filling up the blank space*/
 
         padding: 40px 20px;
 
-        min-height: auto; f
+        min-height: auto;
 
     }
 

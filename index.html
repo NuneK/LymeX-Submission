@@ -11,6 +11,11 @@
 
     <link rel="stylesheet" href="style.css">
 
+    <!-- Comic Neue font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap" rel="stylesheet">
+
     <!-- D3 -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
@@ -328,6 +333,7 @@
   <div class="map-sticky">
 
     <div class="map-text">
+        <h2 class="map-title">Lyme in the U.S.</h2>
         <p id="map-text-content">Move your cursor over the area of interest</p>
     </div>
 
@@ -353,11 +359,15 @@
 <!-- ==========================
      QUIZ SECTION
      Placeholder questions/answers - swap in the real copy whenever
-     it's ready. .quiz-intro is its own full-screen section (title +
-     blurb + start button) preceding .quiz-section, so question 1
-     stays off-screen until the user either scrolls past the intro
-     or clicks "Start Quiz" - see the "Start Quiz" / "Next" handlers
-     in script.js's QUIZ section. Each full-screen question keeps
+     it's ready. .quiz-intro precedes .quiz-section and now reserves
+     200vh of scroll distance (same sticky-pin pattern as
+     .map-section/.map-sticky above) - its content lives in
+     .quiz-intro-sticky, which pins to the viewport for that whole
+     distance so the title holds in place instead of scrolling past
+     in one screen, meaning question 1 stays off-screen a bit longer
+     until the user either scrolls past the intro or clicks "Start
+     Quiz" - see the "Start Quiz" / "Next" handlers in script.js's
+     QUIZ section. Each full-screen question keeps
      its text + checkboxes to the left (.quiz-question-content) and
      leaves the right side of the screen open (.quiz-question-space)
      - see style.css. Checkboxes are plain inputs rather than toggle
@@ -370,11 +380,15 @@
 
 <section class="quiz-intro">
 
-    <h2 class="quiz-title">Symptoms Compiler</h2>
+    <div class="quiz-intro-sticky">
 
-    <p class="quiz-intro-text">This quiz is for compiling your symptoms.</p>
+        <h2 class="quiz-title">Symptoms Compiler</h2>
 
-    <button class="quiz-start" type="button" data-next-question="1">Start Quiz</button>
+        <p class="quiz-intro-text">This quiz is for compiling your symptoms.</p>
+
+        <button class="quiz-start" type="button" data-next-question="1">Start Quiz</button>
+
+    </div>
 
 </section>
 
@@ -450,7 +464,8 @@
      reads every checked .quiz-checkbox across all three questions
      and rebuilds #symptoms-list as a centered bullet list each
      time this section scrolls into view (so it stays in sync if
-     the user scrolls back, changes an answer, and returns).
+     the user scrolls back, changes an answer, and returns). A
+     reminder to screenshot the results sits below the list.
 =========================== -->
 
 <section class="quiz-results" data-question="results">
@@ -458,6 +473,8 @@
     <h2 class="quiz-results-title">Symptoms List</h2>
 
     <ul class="symptoms-list" id="symptoms-list"></ul>
+
+    <p class="quiz-results-note">Make sure to take a screenshot of these symptoms!</p>
 
 </section>
 

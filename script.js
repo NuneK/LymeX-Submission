@@ -48,6 +48,19 @@ const stepOneTexts = stepOneSection.querySelectorAll(".step-text");
 const shortlymeImage = document.getElementById("shortlyme-image");
 const longlymeImage = document.getElementById("longlyme-image");
 
+// Tracks whether longlyme.png has fully finished fading out (as
+// opposed to just being told to hide) - gates tick.png in step 2,
+// see the step2-active toggle in refresh(). Starts true since
+// longlyme.png is hidden with no pending fade on page load.
+let longlymeFaded = true;
+
+longlymeImage.addEventListener("transitionend", event => {
+    if (event.propertyName !== "opacity") return;
+    if (!longlymeImage.classList.contains("visible")) {
+        longlymeFaded = true;
+    }
+});
+
 const STEP_ONE_SWAP_1 = 1 / 3;
 const STEP_ONE_SWAP_2 = 2 / 3;
 
@@ -99,6 +112,7 @@ const THIRD_TEXT_RISE_START = 0.65; // matches baggieEnd in refresh()
 const THIRD_TEXT_RISE_END = 0.90; // matches DOCTOR_FADE_END in refresh()
 
 const tickImage = document.getElementById("tick-image");
+const skinImage = document.getElementById("skin-image");
 const tweezersImage = document.getElementById("tweezers-image");
 const tickTweezerImage = document.getElementById("ticktweezer-image");
 const baggieImage = document.getElementById("baggie-image");
@@ -201,9 +215,12 @@ function refresh() {
         currentStep = null;
         graphicEl.classList.remove("step2-active");
         tweezersImage.style.opacity = 0;
+        tickImage.style.opacity = 0;
+        skinImage.style.opacity = 0;
         stepTwoTextEl.style.transform = "translateY(0px)";
         stepTwoSecondTextEl.style.transform = `translateY(${SECOND_TEXT_START_OFFSET}vh)`;
         stepTwoThirdTextEl.style.transform = `translateY(${THIRD_TEXT_START_OFFSET}vh)`;
+
         return;
     }
 
@@ -228,8 +245,16 @@ function refresh() {
         // shortlyme.png / longlyme.png fade in over symptoms.png in
         // place of the old m-1b / m-1c markers, each for its own text
         // chunk only - and fade back out again if the user scrolls
-        // away to either of the other two chunks.
+        // away to either of the other two chunks. longlymeFaded is
+        // reset to false the moment longlyme.png is told to show -
+        // see the transitionend listener above, which flips it back
+        // to true once its opacity transition actually finishes
+        // hidden, gating tick.png in step 2 (see below).
         shortlymeImage.classList.toggle("visible", substate === "1b");
+
+        if (substate === "1c") {
+            longlymeFaded = false;
+        }
         longlymeImage.classList.toggle("visible", substate === "1c");
 
     } else {
@@ -243,12 +268,17 @@ function refresh() {
     }
 
     // Step 2 swaps symptoms.png out for the skin.png/tick.png stack
-    // - see .graphic.step2-active in style.css. tweezers.png then
-    // fades in on top of tick.png as the user scrolls through the
-    // step, tracking scroll position directly (like the zoom-in
-    // intro) rather than a fixed transition, so it can move back
-    // and forth with the scrollbar.
-    graphicEl.classList.toggle("step2-active", currentStep === "2");
+    // - see .graphic.step2-active in style.css. Gated on
+    // longlymeFaded (set by the transitionend listener above) in
+    // addition to currentStep === "2", so tick.png can't begin to
+    // fade in until longlyme.png has actually finished fading out -
+    // it was previously possible to still catch the tail end of
+    // longlyme.png's fade-out (or worse) while tick.png was already
+    // showing. tweezers.png/ticktweezer.png/baggie.png/doctor.png
+    // don't need the same guard - they're already driven by
+    // `progress` below, which stays at 0 (i.e. hidden) until well
+    // after step 2 begins.
+    graphicEl.classList.toggle("step2-active", currentStep === "2" && longlymeFaded);
 
     if (currentStep === "2") {
 
@@ -274,6 +304,16 @@ function refresh() {
     const textRiseProgress = clamp(progress / TEXT_RISE_END, 0, 1);
     stepTwoTextEl.style.transform =
         `translateY(-${textRiseProgress * TEXT_RISE_FRACTION * window.innerHeight}px)`;
+
+    // tick.png and skin.png fade in together, in step with the text
+    // rise above - so both land just after step 1 releases, as
+    // "Removing the tick..." scrolls into place. skin.png then stays
+    // fully visible as the backdrop for the rest of step 2 (untouched
+    // by the phases below); tick.png gets overridden back to 0 once
+    // the swap to ticktweezer.png happens (see the else branch
+    // further down).
+    skinImage.style.opacity = textRiseProgress;
+    tickImage.style.opacity = textRiseProgress;
 
     // Second text block: stays fully hidden below the viewport until
     // ticktweezer.png finishes lifting (progress passes
@@ -301,10 +341,9 @@ function refresh() {
     if (progress < swapPoint) {
 
         // First phase:
-        // skin + tick visible
+        // skin + tick visible (already faded in above)
         // tweezers fade in
 
-        tickImage.style.opacity = 1;
         tweezersImage.style.opacity = progress / swapPoint;
         tickTweezerImage.style.opacity = 0;
         tickTweezerImage.style.transform =
@@ -433,12 +472,12 @@ function refresh() {
 //                it - no fade of its own.
 //   0.20 - 0.35  wtick.png now holds fully opaque and static
 //                while zoom-caption fades in below the image.
-//   0.35 - 0.45  both wtick.png and the caption hold fully
+//   0.35 - 0.55  both wtick.png and the caption hold fully
 //                visible - a beat to actually read the caption.
-//   0.45 - 0.60  wtick.png and the caption fade back out
+//   0.55 - 0.70  wtick.png and the caption fade back out
 //                together, revealing jwtick.png already sitting
 //                there underneath.
-//   0.60 - 1.0   wtick.png and the caption are fully gone.
+//   0.70 - 1.0   wtick.png and the caption are fully gone.
 //                Only now does jwtick.png shrink and travel from
 //                center-screen onto the sidebar's reserved spot,
 //                landing exactly on it and staying there.
@@ -470,8 +509,8 @@ const CAPTION_GAP = 100;
 // of total scroll progress (0-1) - see the phase breakdown above.
 const TICK_FADE_IN_END = 0.2;
 const CAPTION_FADE_IN_END = 0.35;
-const HOLD_END = 0.45;
-const FADE_OUT_END = 0.6;
+const HOLD_END = 0.7;
+const FADE_OUT_END = 0.7;
 
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
