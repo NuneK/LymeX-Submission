@@ -162,7 +162,7 @@ or thinner, does wonders for filling up the blank space*/
        holds in place for a beat after "What do I do if I've found a
        tick?" finishes fading in, before scrolling away - see
        SCROLL_AWAY_HOLD in script.js, which must match this number. */
-    min-height: calc(260vh + 200px);
+    min-height: calc(260vh + 400px);
 }
 
 /* Step 2 now has a fourth phase after baggie.png/the mini tick
