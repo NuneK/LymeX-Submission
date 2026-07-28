@@ -209,7 +209,7 @@ const TICK_QUESTION_READ_HOLD = 350;
 // is fully visible, before it's allowed to release. Matches the
 // "+ SCROLL_AWAY_HOLD" px added to .step[data-step="1"]'s min-height
 // in style.css - keep both in sync.
-const SCROLL_AWAY_HOLD = 200;
+const SCROLL_AWAY_HOLD = 400;
 
 function resolveTickQuestionFadeProgress() {
 
@@ -860,13 +860,13 @@ const regionFiles = {
 // DEFAULT_MAP_TEXT, captured below from the paragraph's original
 // markup.
 const regionText = {
-    newengland: "This region has the highest incidence of Lyme disease in the United States and accounts for over 60% of all nationwide cases. Blacklegged ticks are common, particularly in wooded and grassy areas. If you experienced a tick bite or developed symptoms after spending time outdoors, discuss Lyme disease with your healthcare provider.",
-    midatlantic: "Lyme disease is also very common in this region, especially in Pennsylvania, New York, New Jersey, Maryland, Delaware, and Virginia. Risk is highest during late spring through early fall but exposure can occur year round. West Virginia has seen one of the highest surge rates (+236% increase in reported incidence).",
-    southeast: "This region has a lower incidence of Lyme disease compared to other parts of the country. However, ticks are still present in wooded and grassy areas. If you experienced a tick bite or developed symptoms after spending time outdoors, discuss Lyme disease with your healthcare provider.",
-    midwest: "Wisconsin and Minnesota report high numbers of Lyme disease cases each year. Ticks carrying Lyme disease are well established throughout much of this region.",
-    southwest: "Lyme disease is uncommon across most hot, dry desert environments because these conditions are generally less favorable for the ticks that transmit it.",
-    mountain: "Lyme disease is relatively uncommon overall, though localized areas of risk exist. Tick exposure can still occur, particularly during outdoor recreation.",
-    pnw: "Lyme disease occurs primarily in northern coastal and foothill regions and accounts for under 1%-2% of total national cases. Overall risk is lower than in the Northeast, but exposure is possible after spending time in wooded or grassy habitats.",
+    newengland: "New England has the highest incidence of Lyme disease in the United States and accounts for over 60% of all nationwide cases. Ticks are common, particularly in wooded and grassy areas. If you experienced a tick bite or developed symptoms after spending time in New England, discuss Lyme Disease with your healthcare provider.",
+    midatlantic: "Lyme disease is also very common in the Mid Atlantic, especially in Pennsylvania, New York, New Jersey, Maryland, Delaware, and Virginia. Risk is highest during late spring through early fall, but exposure can occur year round. West Virginia has seen one of the highest surge rates (+236% increase in reported incidence).",
+    southeast: "The South generally has a lower incidence of Lyme disease compared to more northeastern regions, but ticks are still present in wooded and grassy areas. If you experienced a tick bite or developed symptoms after spending time outdoors in particularly wooded areas, discuss Lyme disease with your healthcare provider.",
+    midwest: "In the Midwest, Michigan, Wisconsin, and Minnesota report high numbers of Lyme disease cases each year. Ticks carrying Lyme disease are well established throughout much of this region, and development of symptoms should be brought up to your doctor.",
+    southwest: "Lyme disease is uncommon across most hot, dry desert environments of the Southwest because these conditions are generally less favorable for the ticks that transmit it.",
+    mountain: "Lyme disease is relatively uncommon in the Mountain West region, though localized areas of risk exist. Tick exposure can still occur, particularly during outdoor recreation.",
+    pnw: "The Pacific Northwest typically sees Lyme disease occuring primarily in northern coastal and foothill regions and accounts for under 1%-2% of total national cases. Overall risk is lower than in the Northeast, but exposure is possible after spending time in wooded or grassy habitats.",
     noncontinent: "Lyme disease is not considered established in Hawaii and Alaska. If you recently traveled to another region, your exposure risk may depend more on where you visited."
 };
 
@@ -1099,30 +1099,33 @@ document.querySelectorAll(".quiz-next, .quiz-start").forEach(button => {
 // QUIZ RESULTS
 // =====================================================
 //
-// Compiles every checked checkbox across all three questions into
-// #symptoms-list. Runs immediately when "See Results" is clicked
-// (so the list is ready before the scroll finishes) and also via
-// IntersectionObserver whenever .quiz-results scrolls into view, so
-// the list stays accurate if the user scrolls back, changes an
-// answer, and returns manually instead of using the button.
+// Compiles every checked checkbox into two lists:
+// #symptoms-list-primary (questions 1-3, the location/state/place
+// type questions) and #symptoms-list-secondary (questions 4-12,
+// the symptom questions) - see .quiz-results-body in style.css for
+// how those are laid out. Runs immediately when "See Results" is
+// clicked (so the lists are ready before the scroll finishes) and
+// also via IntersectionObserver whenever .quiz-results scrolls into
+// view, so the lists stay accurate if the user scrolls back,
+// changes an answer, and returns manually instead of using the
+// button.
 
-const symptomsListEl = document.getElementById("symptoms-list");
+const symptomsListPrimaryEl = document.getElementById("symptoms-list-primary");
+const symptomsListSecondaryEl = document.getElementById("symptoms-list-secondary");
 
-function renderSymptomsList() {
+const PRIMARY_QUESTIONS = ["1", "2", "3"];
 
-    if (!symptomsListEl) return;
+function fillSymptomsList(listEl, checkedBoxes, emptyMessage) {
 
-    const checkedBoxes = document.querySelectorAll(
-        ".quiz-question .quiz-checkbox:checked"
-    );
+    if (!listEl) return;
 
-    symptomsListEl.innerHTML = "";
+    listEl.innerHTML = "";
 
     if (checkedBoxes.length === 0) {
         const emptyItem = document.createElement("li");
         emptyItem.className = "symptoms-list-empty";
-        emptyItem.textContent = "No symptoms selected.";
-        symptomsListEl.appendChild(emptyItem);
+        emptyItem.textContent = emptyMessage;
+        listEl.appendChild(emptyItem);
         return;
     }
 
@@ -1130,8 +1133,31 @@ function renderSymptomsList() {
         const label = checkbox.nextElementSibling;
         const item = document.createElement("li");
         item.textContent = label ? label.textContent.trim() : "";
-        symptomsListEl.appendChild(item);
+        listEl.appendChild(item);
     });
+
+}
+
+function renderSymptomsList() {
+
+    const primaryBoxes = [];
+    const secondaryBoxes = [];
+
+    document.querySelectorAll(".quiz-question .quiz-checkbox:checked").forEach(checkbox => {
+
+        const question = checkbox.closest(".quiz-question");
+        const questionNumber = question ? question.dataset.question : null;
+
+        if (PRIMARY_QUESTIONS.includes(questionNumber)) {
+            primaryBoxes.push(checkbox);
+        } else {
+            secondaryBoxes.push(checkbox);
+        }
+
+    });
+
+    fillSymptomsList(symptomsListPrimaryEl, primaryBoxes, "No locations selected.");
+    fillSymptomsList(symptomsListSecondaryEl, secondaryBoxes, "No symptoms selected.");
 
 }
 

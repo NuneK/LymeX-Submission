@@ -964,9 +964,11 @@ or thinner, does wonders for filling up the blank space*/
 
 .quiz-question-content {
 
-    width: 50%;
+    flex: 0 1 auto;
 
-    max-width: 500px;
+    min-width: min(500px, 100%);
+
+    max-width: 100%;
 
     display: flex;
 
@@ -978,11 +980,14 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
-/* Empty on purpose - reserves the right half of the screen so the
-   question text/checkboxes stay confined to the left. */
+/* Empty on purpose - absorbs whatever width quiz-question-content
+   doesn't need, so the text/checkboxes start in the same spot but
+   are free to stretch right as far as their content requires. */
 .quiz-question-space {
 
     flex: 1;
+
+    min-width: 0;
 
 }
 
@@ -999,6 +1004,50 @@ or thinner, does wonders for filling up the blank space*/
 .quiz-answers {
 
     width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+}
+
+/* Used only by question 2 (states list) - lays its three
+   .quiz-answers-column groups out side by side instead of the
+   usual single stacked column. */
+/* Question 2 (states) is the one place we want the content block
+   itself to fill the row, rather than shrink-wrapping to its
+   content and leaving .quiz-question-space to soak up the rest -
+   that's what lets the three columns spread across the full
+   screen width instead of just the left portion. */
+.quiz-question[data-question="2"] .quiz-question-content {
+
+    flex: 1 1 auto;
+
+    max-width: 1200px;
+
+}
+
+.quiz-question[data-question="2"] .quiz-question-space {
+
+    display: none;
+
+}
+
+.quiz-answers-columns {
+
+    flex-direction: row;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 40px;
+
+}
+
+.quiz-answers-column {
 
     display: flex;
 
@@ -1113,8 +1162,24 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
+/* Holds the two answer columns side by side, filling the section's
+   width - left third for questions 1-3, right two-thirds (with its
+   own centering wrapper) for questions 4-12. */
+.quiz-results-body {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    text-align: left;
+
+}
+
 /* Rebuilt each time the section scrolls into view - see
-   renderSymptomsList() in script.js. */
+   renderSymptomsList() in script.js. Shared base styling for both
+   the primary and secondary lists. */
 .symptoms-list {
 
     list-style: none;
@@ -1127,11 +1192,45 @@ or thinner, does wonders for filling up the blank space*/
 
     flex-direction: column;
 
-    align-items: center;
-
     gap: 14px;
 
     font-size: 1.2rem;
+
+}
+
+/* Left third of the screen - questions 1-3. */
+.symptoms-list-primary {
+
+    width: 33.333%;
+
+    flex-shrink: 0;
+
+    padding-right: 20px;
+
+    align-items: center;
+
+    text-align: center;
+
+}
+
+/* Right two-thirds of the screen, with its list centered within
+   that space (rather than within the full screen) - questions
+   4-12. */
+.quiz-results-secondary {
+
+    width: 66.667%;
+
+    display: flex;
+
+    justify-content: center;
+
+}
+
+.symptoms-list-secondary {
+
+    align-items: center;
+
+    text-align: center;
 
     max-width: 500px;
 
@@ -1306,6 +1405,36 @@ or thinner, does wonders for filling up the blank space*/
 
     }
 
+    .quiz-results-body {
+
+        flex-direction: column;
+
+        align-items: center;
+
+        text-align: center;
+
+        gap: 24px;
+
+    }
+
+    .symptoms-list-primary {
+
+        width: 100%;
+
+        align-items: center;
+
+        text-align: center;
+
+        padding-right: 0;
+
+    }
+
+    .quiz-results-secondary {
+
+        width: 100%;
+
+    }
+
     .quiz-question {
 
         padding: 40px 20px;
@@ -1325,6 +1454,14 @@ or thinner, does wonders for filling up the blank space*/
     .quiz-question-space {
 
         display: none;
+
+    }
+
+    .quiz-answers-columns {
+
+        flex-direction: column;
+
+        gap: 18px;
 
     }
 
