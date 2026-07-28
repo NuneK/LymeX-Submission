@@ -146,6 +146,15 @@
                 </li>
 
                 </ul>
+
+                <!-- Fades in beneath the rest of this chunk on its own
+                     delayed schedule - see .tick-question-text in
+                     style.css (transition-delay matches longlyme.png's
+                     0.6s fade) and the tick-question-text .visible
+                     toggle in script.js's refresh(). Not cleared when
+                     leaving step 1, so it scrolls away naturally with
+                     the rest of this text as step 2 takes over. -->
+                <p class="tick-question-text" id="tick-question-text">What do I do if I've found a tick?</p>
                 
             </div>
 
@@ -474,7 +483,7 @@
 
     <ul class="symptoms-list" id="symptoms-list"></ul>
 
-    <p class="quiz-results-note">Make sure to take a screenshot of these symptoms!</p>
+    <p class="quiz-results-note">Make sure to take a screenshot of these results! They may be useful in determining if you have contracted Lyme Disease</p>
 
 </section>
 

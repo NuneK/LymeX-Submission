@@ -47,19 +47,7 @@ const stepOneSection = document.querySelector('.step[data-step="1"]');
 const stepOneTexts = stepOneSection.querySelectorAll(".step-text");
 const shortlymeImage = document.getElementById("shortlyme-image");
 const longlymeImage = document.getElementById("longlyme-image");
-
-// Tracks whether longlyme.png has fully finished fading out (as
-// opposed to just being told to hide) - gates tick.png in step 2,
-// see the step2-active toggle in refresh(). Starts true since
-// longlyme.png is hidden with no pending fade on page load.
-let longlymeFaded = true;
-
-longlymeImage.addEventListener("transitionend", event => {
-    if (event.propertyName !== "opacity") return;
-    if (!longlymeImage.classList.contains("visible")) {
-        longlymeFaded = true;
-    }
-});
+const tickQuestionText = document.getElementById("tick-question-text");
 
 const STEP_ONE_SWAP_1 = 1 / 3;
 const STEP_ONE_SWAP_2 = 2 / 3;
@@ -133,7 +121,19 @@ function resolveActiveStep() {
 
     for (const step of steps) {
         const rect = step.getBoundingClientRect();
-        if (rect.top <= centerY && rect.bottom >= centerY) {
+        let bottom = rect.bottom;
+
+        // Once "What do I do if I've found a tick?" has fully faded
+        // in, pad step 1's effective bottom edge by
+        // TICK_QUESTION_READ_HOLD px - keeping it the active step for
+        // that much extra scrolling before step 2 is allowed to take
+        // over, regardless of how the raw geometry happens to line up
+        // on a given viewport (see the constant's comment above).
+        if (step === stepOneSection && resolveTickQuestionFadeProgress() >= 1) {
+            bottom += TICK_QUESTION_READ_HOLD;
+        }
+
+        if (rect.top <= centerY && bottom >= centerY) {
             return step;
         }
     }
@@ -150,7 +150,13 @@ function resolveActiveStep() {
 function resolveStepOneSubstate() {
 
     const rect = stepOneSection.getBoundingClientRect();
-    const scrollable = rect.height - window.innerHeight;
+
+    // Reserves SCROLL_AWAY_HOLD px of step 1's scrollable room off
+    // the end (see that constant's comment below), so 1a/1b/1c's own
+    // thirds-based timing is computed exactly as it was before that
+    // hold existed, and the extra room shows up purely as trailing
+    // slack after 1c's fade finishes.
+    const scrollable = rect.height - window.innerHeight - SCROLL_AWAY_HOLD;
 
     if (scrollable <= 0) return "1a";
 
@@ -159,6 +165,71 @@ function resolveStepOneSubstate() {
     if (progress >= STEP_ONE_SWAP_2) return "1c";
     if (progress >= STEP_ONE_SWAP_1) return "1b";
     return "1a";
+
+}
+
+// How far (in px) longlyme.png / "Long Lyme..." gets to sit fully
+// landed and readable before "What do I do if I've found a tick?"
+// starts fading in beneath it - i.e. how much the user has to keep
+// scrolling once substate "1c" becomes active before the fade-in
+// even begins.
+const TICK_QUESTION_SCROLL_DELAY = 400;
+
+// How far (in px), once that landing gap above has passed, the user
+// then needs to keep scrolling before the fade-in finishes.
+// Replaces the old fixed-time transition-delay - this ties the fade
+// to scroll distance instead, so it's a pure function of scroll
+// position just like everything else here (see the STEP RESOLUTION
+// comment above).
+const TICK_QUESTION_SCROLL_DISTANCE = 200;
+
+// How far (in px) past the point "What do I do if I've found a
+// tick?" finishes fading all the way in the user still has to keep
+// scrolling before step 2 is allowed to become the active step (see
+// resolveActiveStep() below). Without this, step 1's handoff to step
+// 2 is driven purely by geometry and can occur before - or right as -
+// the text finishes appearing, depending on viewport height. This
+// guarantees a beat where the question just sits at full opacity, so
+// the user actually gets to read it before the next section takes
+// over.
+const TICK_QUESTION_READ_HOLD = 350;
+
+// How far (in px) past the point "What do I do if I've found a
+// tick?" finishes fading all the way in, the sticky text block
+// itself keeps sitting in place (not scrolling away) before step 2's
+// text takes over the sticky spot. This is separate from
+// TICK_QUESTION_READ_HOLD above - that constant only delays when
+// currentStep flips to "2" for marker/background purposes, but has
+// no effect on .sticky-step-text's own CSS position: sticky release,
+// which is governed purely by how much scrollable room
+// .step[data-step="1"] has left. This amount is carved out of that
+// room and reserved untouched by the substate/fade math below (see
+// SCROLL_AWAY_HOLD's use in resolveStepOneSubstate() and here), so
+// step 1 has to keep scrolling this much further, after the question
+// is fully visible, before it's allowed to release. Matches the
+// "+ SCROLL_AWAY_HOLD" px added to .step[data-step="1"]'s min-height
+// in style.css - keep both in sync.
+const SCROLL_AWAY_HOLD = 200;
+
+function resolveTickQuestionFadeProgress() {
+
+    const rect = stepOneSection.getBoundingClientRect();
+    const scrollable = rect.height - window.innerHeight - SCROLL_AWAY_HOLD;
+
+    if (scrollable <= 0) return 1;
+
+    // Pixel scroll position within step 1, and the pixel position at
+    // which substate "1c" begins - both measured the same way as
+    // resolveStepOneSubstate()'s progress, just left in px instead of
+    // normalized to 0-1, so the constants above mean the same number
+    // of pixels regardless of how tall step 1 is. The fade doesn't
+    // start until TICK_QUESTION_SCROLL_DELAY past that point, giving
+    // longlyme.png/its text a landing site first.
+    const scrolledPx = -rect.top;
+    const swapToOnePx = STEP_ONE_SWAP_2 * scrollable;
+    const fadeStartPx = swapToOnePx + TICK_QUESTION_SCROLL_DELAY;
+
+    return clamp((scrolledPx - fadeStartPx) / TICK_QUESTION_SCROLL_DISTANCE, 0, 1);
 
 }
 
@@ -212,6 +283,7 @@ function refresh() {
         }
         shortlymeImage.classList.remove("visible");
         longlymeImage.classList.remove("visible");
+        tickQuestionText.style.opacity = 0;
         currentStep = null;
         graphicEl.classList.remove("step2-active");
         tweezersImage.style.opacity = 0;
@@ -245,40 +317,42 @@ function refresh() {
         // shortlyme.png / longlyme.png fade in over symptoms.png in
         // place of the old m-1b / m-1c markers, each for its own text
         // chunk only - and fade back out again if the user scrolls
-        // away to either of the other two chunks. longlymeFaded is
-        // reset to false the moment longlyme.png is told to show -
-        // see the transitionend listener above, which flips it back
-        // to true once its opacity transition actually finishes
-        // hidden, gating tick.png in step 2 (see below).
+        // away to either of the other two chunks within step 1.
         shortlymeImage.classList.toggle("visible", substate === "1b");
-
-        if (substate === "1c") {
-            longlymeFaded = false;
-        }
         longlymeImage.classList.toggle("visible", substate === "1c");
 
-    } else {
-        shortlymeImage.classList.remove("visible");
-        longlymeImage.classList.remove("visible");
+        // "What do I do if I've found a tick?" fades in beneath the
+        // "Long Lyme..." text once that chunk is active - driven
+        // directly off how far the user has scrolled past the point
+        // "1c" began (see resolveTickQuestionFadeProgress() above),
+        // rather than a fixed time delay, so it only appears once
+        // the user has actually scrolled a bit further in.
+        tickQuestionText.style.opacity =
+            substate === "1c" ? resolveTickQuestionFadeProgress() : 0;
+
     }
+    // No else branch here: whichever overlay (shortlyme/longlyme) is
+    // showing when the user leaves step 1 is left alone rather than
+    // cleared - clearing it here used to fade it out on its own,
+    // briefly revealing bare symptoms.png underneath before the whole
+    // .image-wrapper faded out below. Now it just fades away as part
+    // of that same group (see .graphic.step2-active in style.css),
+    // so symptoms.png is never seen bare again once longlyme.png (or
+    // shortlyme.png) has appeared. tick-question-text follows the
+    // same left-alone pattern, so it just scrolls away naturally with
+    // the rest of the "Long Lyme..." text once step 2's text takes
+    // over the sticky spot.
 
     if (markerKey !== currentMarkerKey) {
         currentMarkerKey = markerKey;
         showMarkers(markerKey);
     }
 
-    // Step 2 swaps symptoms.png out for the skin.png/tick.png stack
-    // - see .graphic.step2-active in style.css. Gated on
-    // longlymeFaded (set by the transitionend listener above) in
-    // addition to currentStep === "2", so tick.png can't begin to
-    // fade in until longlyme.png has actually finished fading out -
-    // it was previously possible to still catch the tail end of
-    // longlyme.png's fade-out (or worse) while tick.png was already
-    // showing. tweezers.png/ticktweezer.png/baggie.png/doctor.png
-    // don't need the same guard - they're already driven by
-    // `progress` below, which stays at 0 (i.e. hidden) until well
-    // after step 2 begins.
-    graphicEl.classList.toggle("step2-active", currentStep === "2" && longlymeFaded);
+    // Step 2 swaps symptoms.png (and whichever of shortlyme.png/
+    // longlyme.png is still showing over it) out for the skin.png/
+    // tick.png stack - see .graphic.step2-active in style.css, which
+    // fades the whole .image-wrapper group out together as one unit.
+    graphicEl.classList.toggle("step2-active", currentStep === "2");
 
     if (currentStep === "2") {
 

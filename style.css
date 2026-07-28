@@ -158,7 +158,11 @@ or thinner, does wonders for filling up the blank space*/
    other mid-scroll, so it gets extra scroll runway: room for
    the pause, the fade, and a beat to read each chunk of text. */
 .step[data-step="1"] {
-    min-height: 260vh;
+    /* + 200px reserved as trailing scroll room so the sticky text
+       holds in place for a beat after "What do I do if I've found a
+       tick?" finishes fading in, before scrolling away - see
+       SCROLL_AWAY_HOLD in script.js, which must match this number. */
+    min-height: calc(260vh + 200px);
 }
 
 /* Step 2 now has a fourth phase after baggie.png/the mini tick
@@ -629,6 +633,21 @@ or thinner, does wonders for filling up the blank space*/
 .longlyme-image.visible {
 
     opacity: 1;
+
+}
+
+/* "What do I do if I've found a tick?" - lives inside the "Long
+   Lyme..." step-text chunk, right below its bullet list, so it sits
+   beneath that text and scrolls away with it like everything else in
+   the chunk. No CSS transition here - opacity is driven frame-by-frame
+   from scroll position (see TICK_QUESTION_SCROLL_DISTANCE in
+   script.js), so it fades in once the user has scrolled a bit further
+   into this chunk, rather than after a fixed delay. */
+.tick-question-text {
+
+    opacity: 0;
+
+    margin-top: 24px;
 
 }
 
