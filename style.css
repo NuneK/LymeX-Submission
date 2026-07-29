@@ -2,6 +2,10 @@
    GENERAL
 ========================== */
 
+html {
+    scroll-behavior: smooth;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -58,12 +62,52 @@ body {
 
 }
 
+/* Small italic link above the intro title - lets anyone with
+   symptoms jump straight to the quiz intro (#quiz-intro) instead
+   of scrolling through the full story first. Positioned absolutely
+   within .sticky-text (which is already a sticky positioning
+   context) so it sits near the top of the viewport, independent of
+   the vertically-centered h1/paragraph group below it. */
+.intro-skip-link {
 
-.intro p {
+    position: absolute;
+
+    top: 28px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    font-size: .9rem;
+
+    font-style: italic;
+
+    margin: 0;
+
+}
+
+.intro-skip-link a {
+
+    color: #6a8fd8;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+}
+
+.intro-skip-link a:hover {
+
+    text-decoration: underline;
+
+}
+
+
+.intro p:not(.intro-skip-link) {
 
     max-width:800px;
 
-    font-size:1.3rem;
+    font-size:1.25rem;
 
     line-height:1.8;
 
@@ -934,9 +978,9 @@ or thinner, does wonders for filling up the blank space*/
 
 .quiz-start:hover {
 
-    background: #ff2d3e;
+    background: #47b058;
 
-    border-color: #ff2d3e;
+    border-color: #47b058;
 
     transform: translateY(-2px);
 
@@ -1082,7 +1126,7 @@ or thinner, does wonders for filling up the blank space*/
 
     flex-shrink: 0;
 
-    accent-color: #ff2d3e;
+    accent-color: #47b058;
 
     cursor: pointer;
 
@@ -1118,11 +1162,31 @@ or thinner, does wonders for filling up the blank space*/
 
 .quiz-next:hover {
 
-    background: #ff2d3e;
+    background: #47b058;
 
-    border-color: #ff2d3e;
+    border-color: #47b058;
 
     transform: translateY(-2px);
+
+}
+
+/* "Did you know?" aside used in question 4 - lives in the same
+   .quiz-question-content column as the question/answers/button, so
+   it scrolls in and out with the rest of that question rather than
+   being a separately-timed element. */
+.quiz-fact {
+
+    font-size: 0.95rem;
+
+    font-style: italic;
+
+    color: #555;
+
+    border-left: 3px solid #47b058;
+
+    padding-left: 14px;
+
+    margin: 0;
 
 }
 

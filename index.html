@@ -25,6 +25,8 @@
 
 <section class="intro">
     <div class="sticky-text">
+        <p class="intro-skip-link"><a href="#quiz-intro">have symptoms? click here to make a list</a></p>
+
         <h1>
             Could It Be Lyme Disease?
         </h1>
@@ -387,7 +389,7 @@
      answer into a list - see script.js's QUIZ section.
 =========================== -->
 
-<section class="quiz-intro">
+<section class="quiz-intro" id="quiz-intro">
 
     <div class="quiz-intro-sticky">
 
@@ -537,6 +539,8 @@
 
             <button class="quiz-next" type="button" data-next-question="5">Next</button>
 
+            <p class="quiz-fact">Did you know? The percentage of ticks that are infected ranges from none to over 50%, depending on the area and life stage.</p>
+
         </div>
 
         <div class="quiz-question-space"></div>
@@ -550,10 +554,10 @@
             <p class="quiz-question-text">If you saw a tick, approximately how long was it attached?</p>
 
             <div class="quiz-answers">
-                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>The tick was attached less than 12 hours</span></label>
-                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>The tick was attached 12-24 hours</span></label>
-                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>The tick was attached more than 24 hours</span></label>
-                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>I don't know how long the tick was attached</span></label>
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>Less than 12 hours</span></label>
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>12-24 hours</span></label>
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>More than 24 hours</span></label>
+                <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>I don't know</span></label>
                 <label class="quiz-answer"><input type="checkbox" class="quiz-checkbox"><span>I never found a tick</span></label>
             </div>
 

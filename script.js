@@ -1,4 +1,35 @@
 // =====================================================
+// STRAY HASH GUARD
+// =====================================================
+//
+// The skip link below points at #quiz-intro. If that hash is ever
+// sitting in the address bar on page load (e.g. left over from a
+// previous click, since browsers write it to the URL and keep it
+// across reloads), the browser's native behavior is to jump
+// straight to the matching element before any of our JS runs -
+// which makes the site appear to "start" on the quiz. The "load"
+// listener below runs after that native jump has already happened,
+// so it can reliably undo it and clear the hash.
+
+window.addEventListener("load", () => {
+
+    if (window.location.hash) {
+
+        window.scrollTo(0, 0);
+
+        if (window.history.replaceState) {
+            window.history.replaceState(
+                null,
+                "",
+                window.location.pathname + window.location.search
+            );
+        }
+
+    }
+
+});
+
+// =====================================================
 // MARKERS THAT BELONG TO EACH STEP
 // =====================================================
 
@@ -1179,6 +1210,56 @@ if (quizResultsSection) {
     }, { threshold: 0.5 });
 
     resultsObserver.observe(quizResultsSection);
+
+}
+
+// =====================================================
+// INTRO SKIP LINK
+// =====================================================
+//
+// "have symptoms? skip to the quiz" jumps straight to #quiz-intro.
+// A native anchor/scrollIntoView smooth-scroll takes proportionally
+// longer the further down the page the target sits, which on a
+// page this long feels sluggish - so this animates the scroll over
+// a fixed short duration instead, regardless of distance. Each
+// intermediate step uses behavior: "instant" to bypass the global
+// scroll-behavior: smooth CSS rule, since that would otherwise
+// stack its own smoothing on top of this animation.
+
+const skipToQuizLink = document.querySelector(".intro-skip-link a");
+const quizIntroSection = document.getElementById("quiz-intro");
+
+if (skipToQuizLink && quizIntroSection) {
+
+    skipToQuizLink.addEventListener("click", event => {
+
+        event.preventDefault();
+
+        const duration = 600;
+        const startY = window.scrollY;
+        const endY = startY + quizIntroSection.getBoundingClientRect().top;
+        const startTime = performance.now();
+
+        function step(now) {
+
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+
+            window.scrollTo({
+                top: startY + (endY - startY) * eased,
+                left: 0,
+                behavior: "instant"
+            });
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+
+        }
+
+        requestAnimationFrame(step);
+
+    });
 
 }
 
