@@ -1198,11 +1198,11 @@ or thinner, does wonders for filling up the blank space*/
 
     width: 100%;
 
-    height: 100vh;
+    min-height: 100vh;
 
     background: rgb(243, 209, 174);
 
-    padding: 0 60px;
+    padding: 80px 60px;
 
     display: flex;
 
@@ -1226,32 +1226,40 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
-/* Holds the two labeled boxes side by side, centered within the
-   section - left box for questions 1-3, right box for questions
-   4-12. */
+/* Sits directly beneath the title. */
+.quiz-results-subtitle {
+
+    font-size: 1.2rem;
+
+    margin: 0;
+
+}
+
+/* Holds the four labeled boxes stacked on top of each other, each
+   stretching to the section's full width - Exposure History
+   (questions 1-5), Symptoms (questions 6-9), Timeline (questions
+   10-11), and Other Recent Illnesses (question 12). */
 .quiz-results-body {
 
     width: 100%;
 
     display: flex;
 
+    flex-direction: column;
+
     align-items: stretch;
 
-    justify-content: center;
-
-    gap: 32px;
+    gap: 24px;
 
     text-align: left;
 
 }
 
-/* Each labeled box - equal width, bordered card containing a
+/* Each labeled box - full width, bordered card containing a
    heading and its symptoms-list. */
 .quiz-results-box {
 
-    flex: 1;
-
-    max-width: 420px;
+    width: 100%;
 
     background: rgba(255, 255, 255, 0.45);
 
@@ -1316,6 +1324,20 @@ or thinner, does wonders for filling up the blank space*/
     color: #777;
 
     font-style: italic;
+
+}
+
+/* Closing statement the user can read to their provider, shown
+   below the four boxes. */
+.quiz-results-statement {
+
+    font-size: 1.1rem;
+
+    font-style: italic;
+
+    max-width: 700px;
+
+    margin: 0;
 
 }
 
@@ -1475,7 +1497,7 @@ or thinner, does wonders for filling up the blank space*/
 
     .quiz-results {
 
-        padding: 0 20px;
+        padding: 60px 20px;
 
     }
 

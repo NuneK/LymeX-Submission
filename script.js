@@ -1130,21 +1130,27 @@ document.querySelectorAll(".quiz-next, .quiz-start").forEach(button => {
 // QUIZ RESULTS
 // =====================================================
 //
-// Compiles every checked checkbox into two lists:
-// #symptoms-list-primary (questions 1-3, the location/state/place
-// type questions) and #symptoms-list-secondary (questions 4-12,
-// the symptom questions) - see .quiz-results-body in style.css for
-// how those are laid out. Runs immediately when "See Results" is
-// clicked (so the lists are ready before the scroll finishes) and
-// also via IntersectionObserver whenever .quiz-results scrolls into
-// view, so the lists stay accurate if the user scrolls back,
-// changes an answer, and returns manually instead of using the
-// button.
+// Compiles every checked checkbox into four lists:
+// #symptoms-list-exposure (questions 1-5, exposure history),
+// #symptoms-list-symptoms (questions 6-9, symptoms),
+// #symptoms-list-timeline (questions 10-11, timeline), and
+// #symptoms-list-other (question 12, other recent illnesses) - see
+// .quiz-results-body in style.css for how those are laid out. Runs
+// immediately when "See Results" is clicked (so the lists are
+// ready before the scroll finishes) and also via
+// IntersectionObserver whenever .quiz-results scrolls into view,
+// so the lists stay accurate if the user scrolls back, changes an
+// answer, and returns manually instead of using the button.
 
-const symptomsListPrimaryEl = document.getElementById("symptoms-list-primary");
-const symptomsListSecondaryEl = document.getElementById("symptoms-list-secondary");
+const symptomsListExposureEl = document.getElementById("symptoms-list-exposure");
+const symptomsListSymptomsEl = document.getElementById("symptoms-list-symptoms");
+const symptomsListTimelineEl = document.getElementById("symptoms-list-timeline");
+const symptomsListOtherEl = document.getElementById("symptoms-list-other");
 
-const PRIMARY_QUESTIONS = ["1", "2", "3"];
+const EXPOSURE_QUESTIONS = ["1", "2", "3", "4", "5"];
+const SYMPTOMS_QUESTIONS = ["6", "7", "8", "9"];
+const TIMELINE_QUESTIONS = ["10", "11"];
+const OTHER_QUESTIONS = ["12"];
 
 function fillSymptomsList(listEl, checkedBoxes, emptyMessage) {
 
@@ -1171,24 +1177,32 @@ function fillSymptomsList(listEl, checkedBoxes, emptyMessage) {
 
 function renderSymptomsList() {
 
-    const primaryBoxes = [];
-    const secondaryBoxes = [];
+    const exposureBoxes = [];
+    const symptomsBoxes = [];
+    const timelineBoxes = [];
+    const otherBoxes = [];
 
     document.querySelectorAll(".quiz-question .quiz-checkbox:checked").forEach(checkbox => {
 
         const question = checkbox.closest(".quiz-question");
         const questionNumber = question ? question.dataset.question : null;
 
-        if (PRIMARY_QUESTIONS.includes(questionNumber)) {
-            primaryBoxes.push(checkbox);
-        } else {
-            secondaryBoxes.push(checkbox);
+        if (EXPOSURE_QUESTIONS.includes(questionNumber)) {
+            exposureBoxes.push(checkbox);
+        } else if (SYMPTOMS_QUESTIONS.includes(questionNumber)) {
+            symptomsBoxes.push(checkbox);
+        } else if (TIMELINE_QUESTIONS.includes(questionNumber)) {
+            timelineBoxes.push(checkbox);
+        } else if (OTHER_QUESTIONS.includes(questionNumber)) {
+            otherBoxes.push(checkbox);
         }
 
     });
 
-    fillSymptomsList(symptomsListPrimaryEl, primaryBoxes, "No locations selected.");
-    fillSymptomsList(symptomsListSecondaryEl, secondaryBoxes, "No symptoms selected.");
+    fillSymptomsList(symptomsListExposureEl, exposureBoxes, "No exposure history selected.");
+    fillSymptomsList(symptomsListSymptomsEl, symptomsBoxes, "No symptoms selected.");
+    fillSymptomsList(symptomsListTimelineEl, timelineBoxes, "No timeline details selected.");
+    fillSymptomsList(symptomsListOtherEl, otherBoxes, "No other recent illnesses selected.");
 
 }
 
