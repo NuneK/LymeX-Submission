@@ -742,9 +742,11 @@
      four boxes below its question belongs to, and rebuilds that
      box's list as a bullet list each time this section scrolls
      into view (so it stays in sync if the user scrolls back,
-     changes an answer, and returns). A closing statement the user
-     can read to their provider, plus a reminder to screenshot the
-     results, sit below the boxes.
+     changes an answer, and returns). All four boxes plus the
+     closing statement box sit together in .quiz-results-body (a
+     2-column grid - see style.css) so the whole set is visible on
+     screen at once for a screenshot, with a reminder to do so
+     below.
 =========================== -->
 
 <section class="quiz-results" data-question="results">
@@ -753,15 +755,17 @@
 
     <p class="quiz-results-subtitle">Based on your responses, consider discussing the following:</p>
 
-    <!-- Four labeled boxes stacked on top of each other, each
-         stretching the full width of the screen: Exposure History
-         (questions 1-5), Symptoms (questions 6-9), Timeline
-         (questions 10-11), and Other Recent Illnesses (question
-         12). All four lists are rebuilt by renderSymptomsList() in
-         script.js, which splits checked boxes by which
-         .quiz-question they came from - the box wrapper markup
-         here doesn't affect that lookup, since it targets the ul
-         ids directly. -->
+    <!-- Exposure History (questions 1-5) and Symptoms (questions
+         6-9) sit side by side in the first row, Timeline (questions
+         10-11) and Other Recent Illnesses (question 12) side by
+         side in the second row, and the closing statement spans
+         the full width in its own box below both rows - see the
+         grid-column rule on .quiz-results-statement-box in
+         style.css. All four lists are rebuilt by
+         renderSymptomsList() in script.js, which splits checked
+         boxes by which .quiz-question they came from - the box
+         wrapper markup here doesn't affect that lookup, since it
+         targets the ul ids directly. -->
     <div class="quiz-results-body">
 
         <div class="quiz-results-box">
@@ -784,9 +788,11 @@
             <ul class="symptoms-list symptoms-list-other" id="symptoms-list-other"></ul>
         </div>
 
-    </div>
+        <div class="quiz-results-box quiz-results-statement-box">
+            <p class="quiz-results-statement">Based on my recent travel or outdoor exposure and the symptoms I've experienced, I am concerned that Lyme disease may be a possible explanation and would like to be evaluated.</p>
+        </div>
 
-    <p class="quiz-results-statement">Based on my recent travel or outdoor exposure and the symptoms I've experienced, I am concerned that Lyme disease may be a possible explanation and would like to be evaluated.</p>
+    </div>
 
     <p class="quiz-results-note">Make sure to take a screenshot of these results! They may be useful in determining if you have contracted Lyme Disease</p>
 

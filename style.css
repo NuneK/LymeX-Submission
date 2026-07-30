@@ -1202,7 +1202,7 @@ or thinner, does wonders for filling up the blank space*/
 
     background: rgb(243, 209, 174);
 
-    padding: 80px 60px;
+    padding: 40px 60px;
 
     display: flex;
 
@@ -1214,13 +1214,13 @@ or thinner, does wonders for filling up the blank space*/
 
     text-align: center;
 
-    gap: 24px;
+    gap: 16px;
 
 }
 
 .quiz-results-title {
 
-    font-size: 2.5rem;
+    font-size: 2.2rem;
 
     margin: 0;
 
@@ -1229,37 +1229,37 @@ or thinner, does wonders for filling up the blank space*/
 /* Sits directly beneath the title. */
 .quiz-results-subtitle {
 
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 
     margin: 0;
 
 }
 
-/* Holds the four labeled boxes stacked on top of each other, each
-   stretching to the section's full width - Exposure History
-   (questions 1-5), Symptoms (questions 6-9), Timeline (questions
-   10-11), and Other Recent Illnesses (question 12). */
+/* Two-column grid holding the four labeled boxes plus the
+   statement box - Exposure History (questions 1-5) and Symptoms
+   (questions 6-9) fill the first row, Timeline (questions 10-11)
+   and Other Recent Illnesses (question 12) fill the second row,
+   and .quiz-results-statement-box spans both columns in a third
+   row (see its grid-column rule below). Keeping everything in one
+   grid, rather than stacking full-width boxes, keeps the whole set
+   visible on screen together for a screenshot. */
 .quiz-results-body {
 
     width: 100%;
 
-    display: flex;
+    display: grid;
 
-    flex-direction: column;
+    grid-template-columns: 1fr 1fr;
 
-    align-items: stretch;
-
-    gap: 24px;
+    gap: 16px;
 
     text-align: left;
 
 }
 
-/* Each labeled box - full width, bordered card containing a
-   heading and its symptoms-list. */
+/* Each labeled box - bordered card containing a heading and its
+   symptoms-list. Width comes from its grid cell. */
 .quiz-results-box {
-
-    width: 100%;
 
     background: rgba(255, 255, 255, 0.45);
 
@@ -1267,7 +1267,7 @@ or thinner, does wonders for filling up the blank space*/
 
     border-radius: 16px;
 
-    padding: 24px 28px;
+    padding: 18px 24px;
 
     display: flex;
 
@@ -1279,13 +1279,21 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
+/* Spans both grid columns so the statement reads full-width below
+   the two rows of boxes above it. */
+.quiz-results-statement-box {
+
+    grid-column: 1 / -1;
+
+}
+
 .quiz-results-box-title {
 
-    font-size: 1.3rem;
+    font-size: 1.2rem;
 
-    margin: 0 0 16px 0;
+    margin: 0 0 12px 0;
 
-    padding-bottom: 12px;
+    padding-bottom: 10px;
 
     width: 100%;
 
@@ -1308,9 +1316,9 @@ or thinner, does wonders for filling up the blank space*/
 
     flex-direction: column;
 
-    gap: 14px;
+    gap: 8px;
 
-    font-size: 1.2rem;
+    font-size: 1.05rem;
 
     align-items: center;
 
@@ -1327,8 +1335,8 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
-/* Closing statement the user can read to their provider, shown
-   below the four boxes. */
+/* Closing statement the user can read to their provider, shown in
+   its own full-width box below the other four. */
 .quiz-results-statement {
 
     font-size: 1.1rem;
@@ -1341,10 +1349,10 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
-/* Reminder shown below the symptoms list. */
+/* Reminder shown below the boxes. */
 .quiz-results-note {
 
-    font-size: 1rem;
+    font-size: 0.95rem;
 
     font-style: italic;
 
@@ -1497,27 +1505,23 @@ or thinner, does wonders for filling up the blank space*/
 
     .quiz-results {
 
-        padding: 60px 20px;
+        padding: 40px 20px;
 
     }
 
     .quiz-results-body {
 
-        flex-direction: column;
-
-        align-items: center;
+        grid-template-columns: 1fr;
 
         text-align: center;
 
-        gap: 24px;
+        gap: 16px;
 
     }
 
     .quiz-results-box {
 
-        width: 100%;
-
-        max-width: 100%;
+        text-align: center;
 
     }
 
