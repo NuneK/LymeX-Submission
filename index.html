@@ -25,7 +25,7 @@
 
 <section class="intro">
     <div class="sticky-text">
-        <p class="intro-skip-link"><a href="#quiz-intro">have symptoms? click here to make a list</a></p>
+        <p class="intro-skip-link"><a href="#quiz-intro">suspect lyme disease? click here to make a list to bring to your provider</a></p>
 
         <h1>
             Could It Be Lyme Disease?
@@ -749,17 +749,22 @@
 
     <h2 class="quiz-results-title">Could it be Lyme Disease?</h2>
 
-    <!-- Left third: answers from questions 1-3 (location/state/place
-         type). Right two-thirds: answers from questions 4-12,
-         centered within that remaining space. Both lists are
-         rebuilt by renderSymptomsList() in script.js, which now
-         splits checked boxes by which .quiz-question they came
-         from. -->
+    <!-- Two labeled boxes side by side: left box holds answers from
+         questions 1-3 (location/state/place type), right box holds
+         answers from questions 4-12 (symptoms). Both lists are
+         rebuilt by renderSymptomsList() in script.js, which splits
+         checked boxes by which .quiz-question they came from - the
+         box wrapper markup here doesn't affect that lookup, since
+         it targets the ul ids directly. -->
     <div class="quiz-results-body">
 
-        <ul class="symptoms-list symptoms-list-primary" id="symptoms-list-primary"></ul>
+        <div class="quiz-results-box">
+            <h3 class="quiz-results-box-title">Where I've Been and What I've Done</h3>
+            <ul class="symptoms-list symptoms-list-primary" id="symptoms-list-primary"></ul>
+        </div>
 
-        <div class="quiz-results-secondary">
+        <div class="quiz-results-box">
+            <h3 class="quiz-results-box-title">Symptoms</h3>
             <ul class="symptoms-list symptoms-list-secondary" id="symptoms-list-secondary"></ul>
         </div>
 
@@ -784,6 +789,9 @@
         <li><a href="https://www.cdc.gov/lyme/index.html" target="_blank" rel="noopener">https://www.cdc.gov/lyme/index.html</a></li>
         <li><a href="https://www.bayarealyme.org/our-research/" target="_blank" rel="noopener">https://www.bayarealyme.org/our-research/</a></li>
         <li><a href="https://www.hopkinslyme.org/research-at-the-lyme-disease-center/" target="_blank" rel="noopener">https://www.hopkinslyme.org/research-at-the-lyme-disease-center/</a></li>
+        <li><a href="https://www.lymedisease.org/" target="_blank" rel="noopener">https://www.hopkinslyme.org/lyme-education/lyme-disease-prevention-tips/</a></li>
+        <li><a href="https://www.lymedisease.org/" target="_blank" rel="noopener">https://www.globallymealliance.org/hubfs/GLA_3rd%20to%205th%20Gr%20Student%20workbook_2017V1.pdf</a></li>
+        
     </ul>
 
 </section>
