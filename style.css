@@ -1557,18 +1557,18 @@ or thinner, does wonders for filling up the blank space*/
 
 /* ==========================
    SCROLL-DOWN HINT
-   Thin arrow pinned to the far-left edge of the viewport for the
-   whole scrolling story, nudging the user onward toward the quiz
-   intro. Faded in/out (not display:none) so the transition is
-   smooth - see #scroll-hint.hidden, toggled from script.js.
+   Thin arrow pinned to the bottom center of the viewport for the
+   whole scrolling story, nudging the user onward. Faded in/out (not
+   display:none) so the transition is smooth - see #scroll-hint.hidden,
+   toggled from script.js.
 ========================== */
 
 .scroll-hint {
 
     position: fixed;
-    left: 26px;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
 
     z-index: 25;
 
@@ -1588,7 +1588,7 @@ or thinner, does wonders for filling up the blank space*/
 .scroll-hint-arrow {
 
     width: 26px;
-    height: 37px;
+    height: 48px;
 
     fill: none;
     stroke: #9CAF88;
@@ -1601,7 +1601,7 @@ or thinner, does wonders for filling up the blank space*/
 @media (max-width: 900px) {
 
     .scroll-hint {
-        left: 14px;
+        bottom: 16px;
     }
 
 }

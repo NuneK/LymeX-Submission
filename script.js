@@ -1231,20 +1231,25 @@ if (quizResultsSection) {
 // SCROLL-DOWN HINT
 // =====================================================
 //
-// The thin left-edge arrow (#scroll-hint) is visible for the whole
-// scrolling story and fades out once #quiz-intro reaches the
-// viewport, since at that point the user has already found what
-// it was pointing them toward.
+// The thin bottom-center arrow (#scroll-hint) is visible for the
+// whole scrolling story, staying up through the interactive map,
+// and fades out once the user has scrolled past #map-section
+// entirely (not merely once it first comes into view, since the
+// map itself takes a while to scroll through and the hint should
+// stay up for all of it). Scrolling back up past the map brings it
+// back, same as scrolling back up past the map used to bring back
+// the old quiz-intro-based version of this hint.
 
 const scrollHintEl = document.getElementById("scroll-hint");
-const scrollHintTarget = document.getElementById("quiz-intro");
+const scrollHintTarget = document.getElementById("map-section");
 
 if (scrollHintEl && scrollHintTarget) {
 
     const scrollHintObserver = new IntersectionObserver(entries => {
 
         entries.forEach(entry => {
-            scrollHintEl.classList.toggle("hidden", entry.isIntersecting);
+            const scrolledPast = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+            scrollHintEl.classList.toggle("hidden", scrolledPast);
         });
 
     }, { threshold: 0 });

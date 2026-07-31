@@ -339,7 +339,7 @@
      - just these outline PNGs) and reveals the matching overlay.
 =========================== -->
 
-<section class="map-section">
+<section class="map-section" id="map-section">
 
   <div class="map-sticky">
 
@@ -815,7 +815,7 @@
         <li><a href="https://www.hopkinslyme.org/research-at-the-lyme-disease-center/" target="_blank" rel="noopener">https://www.hopkinslyme.org/research-at-the-lyme-disease-center/</a></li>
         <li><a href="https://www.lymedisease.org/" target="_blank" rel="noopener">https://www.hopkinslyme.org/lyme-education/lyme-disease-prevention-tips/</a></li>
         <li><a href="https://www.lymedisease.org/" target="_blank" rel="noopener">https://www.globallymealliance.org/hubfs/GLA_3rd%20to%205th%20Gr%20Student%20workbook_2017V1.pdf</a></li>
-        
+        <li><a href="https://www.lymedisease.org/" target="_blank" rel="noopener">Thank you to the MAESTRO study team at MIT for their guidance and help</a></li>
     </ul>
 
 </section>
@@ -848,15 +848,16 @@
 
 <!-- ==========================
      SCROLL-DOWN HINT
-     Thin, persistent arrow pinned to the far left edge of the
-     viewport, nudging the user to keep scrolling through the story
-     toward #quiz-intro. Fades out once quiz-intro scrolls into view
-     - see the scrollHintObserver in script.js.
+     Thin, persistent arrow pinned to the bottom center of the
+     viewport, nudging the user to keep scrolling through the story.
+     Stays visible through the interactive map section and fades out
+     once the user has scrolled past it - see the scrollHintObserver
+     in script.js, which watches #map-section.
 =========================== -->
 
 <div class="scroll-hint" id="scroll-hint" aria-hidden="true">
-    <svg class="scroll-hint-arrow" viewBox="0 0 24 34" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2 V22 M4 14 L12 22 L20 14" />
+    <svg class="scroll-hint-arrow" viewBox="0 0 24 44" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2 V40 M4 34 L12 42 L20 34" />
     </svg>
 </div>
 
