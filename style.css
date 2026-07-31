@@ -1587,10 +1587,14 @@ or thinner, does wonders for filling up the blank space*/
 
 .scroll-hint-arrow {
 
-    width: 22px;
-    height: 44px;
+    width: 26px;
+    height: 26px;
 
-    fill: #47b058;
+    fill: none;
+    stroke: #47b058;
+    stroke-width: 3;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
 
 }
 
