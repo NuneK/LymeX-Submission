@@ -1566,7 +1566,7 @@ or thinner, does wonders for filling up the blank space*/
 .scroll-hint {
 
     position: fixed;
-    left: 14px;
+    left: 22px;
     top: 50%;
     transform: translateY(-50%);
 
@@ -1575,12 +1575,13 @@ or thinner, does wonders for filling up the blank space*/
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
 
     pointer-events: none;
 
     opacity: 0.55;
     transition: opacity 0.5s ease;
+
+    animation: scroll-hint-bounce 1.6s ease-in-out infinite;
 
 }
 
@@ -1590,35 +1591,44 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
-.scroll-hint-arrow {
+.scroll-hint-shaft {
+
+    width: 2px;
+    height: 26px;
+
+    background: #333;
+
+}
+
+.scroll-hint-head {
 
     width: 10px;
     height: 10px;
+
+    margin-top: -5px;
 
     border-right: 2px solid #333;
     border-bottom: 2px solid #333;
 
     transform: rotate(45deg);
 
-    animation: scroll-hint-bounce 1.6s ease-in-out infinite;
-
 }
 
 @keyframes scroll-hint-bounce {
 
     0%, 100% {
-        transform: rotate(45deg) translate(0, 0);
+        transform: translateY(-50%);
     }
 
     50% {
-        transform: rotate(45deg) translate(4px, 4px);
+        transform: translateY(calc(-50% + 6px));
     }
 
 }
 
 @media (prefers-reduced-motion: reduce) {
 
-    .scroll-hint-arrow {
+    .scroll-hint {
         animation: none;
     }
 
@@ -1627,7 +1637,7 @@ or thinner, does wonders for filling up the blank space*/
 @media (max-width: 900px) {
 
     .scroll-hint {
-        left: 6px;
+        left: 12px;
     }
 
 }
