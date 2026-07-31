@@ -1228,6 +1228,32 @@ if (quizResultsSection) {
 }
 
 // =====================================================
+// SCROLL-DOWN HINT
+// =====================================================
+//
+// The thin left-edge arrow (#scroll-hint) is visible for the whole
+// scrolling story and fades out once #quiz-intro reaches the
+// viewport, since at that point the user has already found what
+// it was pointing them toward.
+
+const scrollHintEl = document.getElementById("scroll-hint");
+const scrollHintTarget = document.getElementById("quiz-intro");
+
+if (scrollHintEl && scrollHintTarget) {
+
+    const scrollHintObserver = new IntersectionObserver(entries => {
+
+        entries.forEach(entry => {
+            scrollHintEl.classList.toggle("hidden", entry.isIntersecting);
+        });
+
+    }, { threshold: 0 });
+
+    scrollHintObserver.observe(scrollHintTarget);
+
+}
+
+// =====================================================
 // INTRO SKIP LINK
 // =====================================================
 //
