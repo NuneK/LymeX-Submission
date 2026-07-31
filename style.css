@@ -1572,16 +1572,10 @@ or thinner, does wonders for filling up the blank space*/
 
     z-index: 25;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
     pointer-events: none;
 
     opacity: 0.9;
     transition: opacity 0.5s ease;
-
-    animation: scroll-hint-bounce 1.6s ease-in-out infinite;
 
 }
 
@@ -1591,48 +1585,12 @@ or thinner, does wonders for filling up the blank space*/
 
 }
 
-.scroll-hint-shaft {
+.scroll-hint-arrow {
 
-    width: 4px;
-    height: 46px;
+    width: 22px;
+    height: 44px;
 
-    background: #47b058;
-    border-radius: 2px;
-
-}
-
-.scroll-hint-head {
-
-    width: 18px;
-    height: 18px;
-
-    margin-top: -9px;
-
-    border-right: 4px solid #47b058;
-    border-bottom: 4px solid #47b058;
-    border-radius: 0 0 3px 0;
-
-    transform: rotate(45deg);
-
-}
-
-@keyframes scroll-hint-bounce {
-
-    0%, 100% {
-        transform: translateY(-50%);
-    }
-
-    50% {
-        transform: translateY(calc(-50% + 10px));
-    }
-
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-    .scroll-hint {
-        animation: none;
-    }
+    fill: #47b058;
 
 }
 
